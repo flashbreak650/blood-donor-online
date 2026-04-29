@@ -88,6 +88,107 @@
         100% { opacity: 1; }
     }
 </style>  
+<style>
+    .hb-share-mini {
+        background: #d90429;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin: 10px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .hb-share-mini:active { transform: scale(0.95); }
+    
+    #copyToast {
+        visibility: hidden;
+        background: #333;
+        color: #fff;
+        text-align: center;
+        padding: 8px 15px;
+        position: fixed;
+        bottom: 85px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px;
+        font-size: 12px;
+        z-index: 10000;
+    }
+    #copyToast.show { visibility: visible; animation: fadeHB 2.5s; }
+    @keyframes fadeHB { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
+</style>
+
+<div style="text-align: center;">
+    <button class="hb-share-mini" onclick="copyMySite(event)">
+        <i class="fas fa-copy"></i> কপি লিঙ্ক
+    </button>
+</div>
+
+<div id="copyToast">কপি করা হয়েছে</div>
+
+<script>
+function copyMySite(e) {
+    const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://blood-donor-online.netlify.app/";
+    
+    // কপি করার মূল লজিক
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(infoText).then(() => {
+            showHBToast();
+        }).catch(err => {
+            fallbackCopy(infoText);
+        });
+    } else {
+        fallbackCopy(infoText);
+    }
+
+    // ক্লিক এনিমেশন
+    const btn = e.currentTarget;
+    const circle = document.createElement("span");
+    circle.style.width = circle.style.height = "50px";
+    circle.style.position = "absolute";
+    circle.style.background = "rgba(255,255,255,0.3)";
+    circle.style.borderRadius = "50%";
+    circle.style.left = "50%";
+    circle.style.top = "50%";
+    circle.style.transform = "translate(-50%, -50%) scale(0)";
+    circle.style.animation = "rippleHB 0.4s linear";
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 400);
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        showHBToast();
+    } catch (err) {
+        alert("কপি করা সম্ভব হচ্ছে না");
+    }
+    document.body.removeChild(textArea);
+}
+
+function showHBToast() {
+    const toast = document.getElementById("copyToast");
+    toast.className = "show";
+    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+}
+</script>
+
+<style>
+@keyframes rippleHB { to { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
+</style>
+
 
 
 <div id="mainHeader" class="master-app-bar" style="display: none;">
