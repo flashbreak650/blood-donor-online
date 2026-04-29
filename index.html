@@ -105,28 +105,6 @@
     </div>
 </div>
 
-<script>
-    function refreshHeader() {
-        const key = localStorage.getItem('myDonorKey');
-        if (key) {
-            document.getElementById('mainHeader').style.display = 'flex';
-            database.ref('donors/' + key).once('value').then(snap => {
-                const data = snap.val();
-                if (data) {
-                    // নাম সেট করা (যেমন: Hassan vai)
-                    document.getElementById('topNameLabel').innerText = data.name;
-                    // প্রোফাইল পিক সেট করা
-                    document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
-                }
-            });
-        } else {
-            document.getElementById('mainHeader').style.display = 'none';
-        }
-    }
-
-    // আপনার showFeed() ফাংশনের ভেতর refreshHeader(); লিখে দিন অথবা নিচে এটি ব্যবহার করুন:
-    window.addEventListener('load', refreshHeader);
-</script>
     <style>  /* সার্চ বক্স ও বাটন ছোট করার প্রিমিয়াম স্টাইল */
 .search-wrapper {
     width: 100%; max-width: 450px; margin-bottom: 10px;
@@ -318,8 +296,31 @@
         const database = firebase.database();
 
         let myKey = localStorage.getItem('myDonorKey');
-        let currentFilter = 'হ্যাঁ';
+        let currentFilter = 'হ্যাঁ'; // আপনার ডিজাইনের ডিফল্ট ফিল্টার
         let favList = JSON.parse(localStorage.getItem('myFavDonors')) || [];
+
+        // প্রোফাইল হেডার লোডিং ফিক্স
+        function refreshHeader() {
+            if (myKey) {
+                document.getElementById('mainHeader').style.display = 'flex';
+                database.ref('donors/' + myKey).once('value').then(snap => {
+                    const data = snap.val();
+                    if (data) {
+                        document.getElementById('topNameLabel').innerText = data.name;
+                        document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
+                    } else {
+                        // যদি ডেটাবেস থেকে ডিলিট হয়ে যায়, কিন্তু ব্রাউজারে কি সেভ থাকে
+                        localStorage.removeItem('myDonorKey');
+                        myKey = null;
+                        document.getElementById('mainHeader').style.display = 'none';
+                    }
+                }).catch(err => console.log(err));
+            } else {
+                document.getElementById('mainHeader').style.display = 'none';
+            }
+        }
+
+        window.addEventListener('load', refreshHeader);
 
         function saveToOnline() {
             const btn = document.getElementById('saveBtn');
@@ -347,7 +348,6 @@
                 return; 
             }
 
-            // বাটন লোডিং স্টেট
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> আপডেট হচ্ছে...";
             btn.disabled = true;
 
@@ -359,7 +359,8 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 alert("আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!"); 
-                showFeed(); // আপডেট হওয়ার পর হোম পেজে নিয়ে যাবে
+                refreshHeader(); // সেভ করার পর হেডার আপডেট করবে
+                showFeed(); 
             }).catch((error) => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -368,7 +369,7 @@
         }
 
         function loadDonors() {
-            // আগের লিসেনার মুছে নতুন করে কল করা হচ্ছে যাতে হ্যাং না করে
+            // আগের লিসেনার মুছে ফেলা হলো যাতে ফিল্টার বাটন হ্যাং না করে
             database.ref('donors/').off('value'); 
             
             database.ref('donors/').on('value', (snapshot) => {
@@ -379,7 +380,6 @@
                 let onlineDonors = 0;
                 let offlineDonors = 0;
 
-                // যদি ডাটাবেস সম্পূর্ণ খালি থাকে
                 if (!snapshot.exists()) {
                     document.getElementById('countTotal').innerText = "0";
                     document.getElementById('countOnline').innerText = "0";
@@ -395,9 +395,12 @@
                     totalDonors++;
                     if(data.canDonate === "হ্যাঁ") { onlineDonors++; } else { offlineDonors++; }
 
+                    // ফিল্টার বাটন কাজ করার লজিক
                     if(currentFilter === 'fav') {
                         if(!favList.includes(key)) return;
-                    } else if(data.canDonate !== currentFilter) return;
+                    } else if(data.canDonate !== currentFilter) {
+                        return; // যদি ফিল্টার 'হ্যাঁ' হয়, তাহলে 'না' গুলো বাদ পড়বে
+                       }
 
                     const statusClass = (data.canDonate === "হ্যাঁ") ? "status-yes" : "status-no";
                     const statusText = (data.canDonate === "হ্যাঁ") ? "● এখন রক্ত দিতে পারবেন" : "○ এখন রক্ত দিতে পারবেন না";
@@ -488,6 +491,7 @@
                     localStorage.removeItem('myDonorKey');
                     myKey = null;
                     alert("আপনার প্রোফাইল মুছে ফেলা হয়েছে।");
+                    refreshHeader();
                     showReg();
                 });
             }
@@ -523,6 +527,7 @@
         }
 
         function showFeed() {
+            refreshHeader();
             document.getElementById('regPage').style.display = 'none';
             document.getElementById('statsArea').style.display = 'grid'; 
             document.getElementById('filterTabs').style.display = 'flex';
@@ -533,6 +538,7 @@
         }
 
         function showReg() {
+            refreshHeader();
             document.getElementById('regPage').style.display = 'block';
             document.getElementById('statsArea').style.display = 'none';
             document.getElementById('filterTabs').style.display = 'none';
