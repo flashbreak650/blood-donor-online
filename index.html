@@ -2,26 +2,142 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<style>
+    /* প্রিমিয়াম মাস্টার হেডার ডিজাইন */
+    .master-app-bar {
+        width: 100%;
+        max-width: 450px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 12px 18px;
+        display: flex;
+        justify-content: space-between; /* নাম বামে এবং প্রোফাইল ডানে সরাবে */
+        align-items: center;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+    }
 
-    <style>
+    /* বাম পাশের ওয়েবসাইট নাম */
+    .brand-side h1 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 900;
+        color: #2b2d42;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    .brand-side span {
+        font-size: 10px;
+        color: #d90429;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .status-blink {
+        width: 7px;
+        height: 7px;
+        background: #d90429;
+        border-radius: 50%;
+        animation: blinker 1.5s infinite;
+    }
+
+    /* ডান পাশের ডোনার প্রোফাইল কার্ড */
+    .user-profile-side {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fdf2f2;
+        padding: 5px 12px;
+        border-radius: 40px;
+        border: 1px solid #fee2e2;
+        cursor: pointer;
+    }
+    .user-text h2 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: #333;
+        text-align: right;
+    }
+    .user-text span {
+        font-size: 9px;
+        color: #d90429;
+        font-weight: bold;
+        display: block;
+        text-align: right;
+    }
+    .user-img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2px solid #d90429;
+        background: #fff;
+    }
+
+    @keyframes blinker {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
+    }
+</style>
+
+<div id="mainHeader" class="master-app-bar" style="display: none;">
+    <div class="brand-side">
+        <h1>BLOOD web </h1>
+        <span><span class="status-blink"></span> Online</span>
+    </div>
+
+    <div class="user-profile-side" onclick="showReg()">
+        <div class="user-text">
+            <h2 id="topNameLabel">লোড হচ্ছে..</h2>
+            <span>আমার প্রোফাইল</span>
+        </div>
+        <img id="topAvatarImg" src="" class="user-img">
+    </div>
+</div>
+
+<script>
+    function refreshHeader() {
+        const key = localStorage.getItem('myDonorKey');
+        if (key) {
+            document.getElementById('mainHeader').style.display = 'flex';
+            database.ref('donors/' + key).once('value').then(snap => {
+                const data = snap.val();
+                if (data) {
+                    // নাম সেট করা (যেমন: Hassan vai)
+                    document.getElementById('topNameLabel').innerText = data.name;
+                    // প্রোফাইল পিক সেট করা
+                    document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
+                }
+            });
+        } else {
+            document.getElementById('mainHeader').style.display = 'none';
+        }
+    }
+
+    // আপনার showFeed() ফাংশনের ভেতর refreshHeader(); লিখে দিন অথবা নিচে এটি ব্যবহার করুন:
+    window.addEventListener('load', refreshHeader);
+</script>
+    <style> 
         :root {
             --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703;
         }
 
-        /* ডেস্কটপ এবং মোবাইল দুটিতেই ঠিকঠাক কাজ করার জন্য ফিক্স */
         body {
             background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif;
             display: flex; flex-direction: column; align-items: center; 
-            padding: 15px; padding-bottom: 80px; margin: 0;
-            overflow-x: hidden; /* ডাইনে-বামে নড়া বন্ধ */
+            padding: 15px; padding-bottom: 90px; margin: 0;
+            overflow-x: hidden;
         }
 
-        /* অনলাইন/অফলাইন কাউন্টার বক্স (আপনার চাহিদামতো ৩টা বক্স) */
         .stats-container {
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; 
             width: 100%; max-width: 450px; margin-bottom: 15px;
@@ -33,12 +149,10 @@
         .stat-box b { display: block; font-size: 18px; color: var(--primary); margin-bottom: 3px; }
         .stat-box span { font-size: 11px; color: var(--gray); font-weight: bold; }
 
-        /* ফিল্টার বাটন ডিজাইন - আপনার ডিজাইনের সাথে ম্যাচিং */
         .filter-container { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-bottom: 15px; }
         .filter-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: white; color: var(--gray); font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .filter-btn.active { background: var(--primary); color: white; }
 
-        /* আপনার অরিজিনাল রেজিস্ট্রেশন ফর্ম */
         #regPage {
             background: white; width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box;
             border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;
@@ -52,7 +166,6 @@
         
         #donorList { width: 100%; max-width: 450px; }
 
-        /* আপনার অরিজিনাল ডোনার কার্ড */
         .donor-card {
             background: white; width: 100%; border-radius: 12px; box-sizing: border-box;
             padding: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border: 1px solid #eef0f2;
@@ -92,11 +205,14 @@
         .btn-call { background: var(--primary); color: white; }
         .btn-del-card { background: #333; color: white; grid-column: 1 / 3; margin-top: 5px; }
 
-        /* বটম নেভ ডেস্কটপেও মাঝখানে থাকবে */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 450px; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; z-index: 100; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 450px; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; z-index: 1000; }
         .nav-item { border: none; background: none; color: var(--gray); font-size: 20px; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
-    </style>
+
+        /* এম্পটি স্টেট (যদি কোনো ডোনার না থাকে) */
+        .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
+    
+</style>
 </head>
 <body>
 
@@ -116,9 +232,9 @@
     </div>
 
     <div class="filter-container" id="filterTabs" style="display: none;">
-        <button class="filter-btn active" onclick="setFilter('হ্যাঁ', this)">সক্রিয় লিস্ট</button>
-        <button class="filter-btn" onclick="setFilter('না', this)">অফলাইন লিস্ট</button>
-        <button class="filter-btn" onclick="setFilter('fav', this)">ফেভারিট</button>
+        <button type="button" class="filter-btn active" onclick="setFilter('হ্যাঁ', this)">সক্রিয় লিস্ট</button>
+        <button type="button" class="filter-btn" onclick="setFilter('না', this)">অফলাইন লিস্ট</button>
+        <button type="button" class="filter-btn" onclick="setFilter('fav', this)">ফেভারিট</button>
     </div>
 
     <div id="regPage">
@@ -146,15 +262,15 @@
             <div class="input-group full"><label><i class="fas fa-info-circle"></i> বায়ো/বিবরণ</label><textarea id="inBio" rows="2"></textarea></div>
         </div>
         <div id="btnArea">
-            <button onclick="saveToOnline()" id="saveBtn" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;"><i class="fas fa-upload"></i> পোস্ট আপডেট করুন</button>
+            <button type="button" onclick="saveToOnline()" id="saveBtn" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;"><i class="fas fa-upload"></i> পোস্ট আপডেট করুন</button>
         </div>
     </div>
 
     <div id="donorList" style="display:none;"></div>
 
     <div class="bottom-nav">
-        <button id="navHome" class="nav-item" onclick="showFeed()"><i class="fas fa-home"></i></button>
-        <button id="navReg" class="nav-item active" onclick="showReg()"><i class="fas fa-user-edit"></i></button>
+        <button type="button" id="navHome" class="nav-item" onclick="showFeed()"><i class="fas fa-home"></i></button>
+        <button type="button" id="navReg" class="nav-item active" onclick="showReg()"><i class="fas fa-user-edit"></i></button>
     </div>
 
     <script>
@@ -163,7 +279,11 @@
             databaseURL: "https://blood-donor-online-default-rtdb.firebaseio.com",
             projectId: "blood-donor-online",
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        // ফায়ারবেস ইনিশিয়ালাইজেশন
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const database = firebase.database();
 
         let myKey = localStorage.getItem('myDonorKey');
@@ -171,6 +291,9 @@
         let favList = JSON.parse(localStorage.getItem('myFavDonors')) || [];
 
         function saveToOnline() {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            
             const data = {
                 name: document.getElementById('inName').value,
                 blood: document.getElementById('inBlood').value,
@@ -187,16 +310,36 @@
                 rating: 80,
                 followers: 2
             };
-            if(!data.name || !data.phone) { alert("নাম ও ফোন নম্বর দিন!"); return; }
+
+            if(!data.name || !data.phone) { 
+                alert("দয়া করে আপনার নাম ও ফোন নম্বর দিন!"); 
+                return; 
+            }
+
+            // বাটন লোডিং স্টেট
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> আপডেট হচ্ছে...";
+            btn.disabled = true;
+
             const ref = myKey ? database.ref('donors/' + myKey) : database.ref('donors/').push();
+            
             ref.set(data).then(() => {
                 localStorage.setItem('myDonorKey', ref.key);
                 myKey = ref.key;
-                alert("সফলভাবে আপডেট হয়েছে!"); showFeed();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!"); 
+                showFeed(); // আপডেট হওয়ার পর হোম পেজে নিয়ে যাবে
+            }).catch((error) => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("আপডেট ব্যর্থ হয়েছে! সমস্যা: " + error.message);
             });
         }
 
         function loadDonors() {
+            // আগের লিসেনার মুছে নতুন করে কল করা হচ্ছে যাতে হ্যাং না করে
+            database.ref('donors/').off('value'); 
+            
             database.ref('donors/').on('value', (snapshot) => {
                 const list = document.getElementById('donorList');
                 list.innerHTML = ""; 
@@ -205,19 +348,22 @@
                 let onlineDonors = 0;
                 let offlineDonors = 0;
 
+                // যদি ডাটাবেস সম্পূর্ণ খালি থাকে
+                if (!snapshot.exists()) {
+                    document.getElementById('countTotal').innerText = "0";
+                    document.getElementById('countOnline').innerText = "0";
+                    document.getElementById('countOffline').innerText = "0";
+                    list.innerHTML = "<div class='empty-state'><i class='fas fa-box-open fa-3x'></i><br><br>এখনো কোনো ডোনার নেই!<br>আপনি প্রথম ডোনার হিসেবে রেজিস্ট্রেশন করুন।</div>";
+                    return;
+                }
+
                 snapshot.forEach((child) => {
                     const data = child.val();
                     const key = child.key;
 
-                    // কাউন্টার গোনা হচ্ছে
                     totalDonors++;
-                    if(data.canDonate === "হ্যাঁ") {
-                        onlineDonors++;
-                    } else {
-                        offlineDonors++;
-                    }
+                    if(data.canDonate === "হ্যাঁ") { onlineDonors++; } else { offlineDonors++; }
 
-                    // লিস্ট ফিল্টারিং
                     if(currentFilter === 'fav') {
                         if(!favList.includes(key)) return;
                     } else if(data.canDonate !== currentFilter) return;
@@ -225,6 +371,8 @@
                     const statusClass = (data.canDonate === "হ্যাঁ") ? "status-yes" : "status-no";
                     const statusText = (data.canDonate === "হ্যাঁ") ? "● এখন রক্ত দিতে পারবেন" : "○ এখন রক্ত দিতে পারবেন না";
                     const isFav = favList.includes(key) ? 'active' : '';
+
+                    const isMyPost = (key === myKey);
 
                     list.innerHTML += `
                         <div class="donor-card">
@@ -263,17 +411,18 @@
                                 <div style="font-size: 10px; color: var(--gray); margin-top: 5px;">স্টার দিয়ে রিভিউ দিন</div>
                             </div>
                             <div class="card-actions">
-                                <button class="btn btn-follow" id="fBtn-${key}" onclick="follow('${key}')"><i class="fas fa-heart"></i> ফলো</button>
+                                <button type="button" class="btn btn-follow" id="fBtn-${key}" onclick="follow('${key}')"><i class="fas fa-heart"></i> ফলো</button>
                                 <a href="tel:${data.phone}" class="btn btn-call"><i class="fas fa-phone-alt"></i> কল করুন</a>
-                                <button class="btn btn-del-card" onclick="deletePost('${key}')"><i class="fas fa-trash-alt"></i> ডিলিট করুন</button>
+                                ${isMyPost ? `<button type="button" class="btn btn-del-card" onclick="deletePost('${key}')"><i class="fas fa-trash-alt"></i> ডিলিট করুন</button>` : ''}
                             </div>
                         </div>`;
                 });
 
-                // বক্সে সংখ্যাগুলো বসানো হচ্ছে
                 document.getElementById('countTotal').innerText = totalDonors;
                 document.getElementById('countOnline').innerText = onlineDonors;
                 document.getElementById('countOffline').innerText = offlineDonors;
+            }, (error) => {
+                alert("ডাটাবেস লোড হতে সমস্যা হচ্ছে! এরর: " + error.message);
             });
         }
 
@@ -293,7 +442,7 @@
 
         function follow(key) {
             database.ref('donors/' + key + '/followers').transaction(c => (c || 0) + 1);
-            document.getElementById('fBtn-'+key).innerText = "Following";
+            document.getElementById('fBtn-'+key).innerHTML = "<i class='fas fa-check'></i> Following";
             document.getElementById('fBtn-'+key).classList.add('active');
         }
 
@@ -303,14 +452,21 @@
         }
 
         function deletePost(key) {
-            if(confirm("ডিলিট করতে চান?")) database.ref('donors/' + key).remove();
+            if(confirm("ডিলিট করতে চান?")) {
+                database.ref('donors/' + key).remove().then(() => {
+                    localStorage.removeItem('myDonorKey');
+                    myKey = null;
+                    alert("আপনার প্রোফাইল মুছে ফেলা হয়েছে।");
+                    showReg();
+                });
+            }
         }
 
         function updateUI() {
             if(myKey) {
                 document.getElementById('formTitle').innerHTML = "<i class='fas fa-user-cog'></i> প্রোফাইল এডিট করুন";
                 document.getElementById('saveBtn').innerHTML = "<i class='fas fa-upload'></i> পোস্ট আপডেট করুন";
-                database.ref('donors/'+myKey).once('value', s => {
+                database.ref('donors/'+myKey).once('value').then(s => {
                     const d = s.val();
                     if(d) {
                         document.getElementById('inName').value = d.name || "";
@@ -326,13 +482,18 @@
                         document.getElementById('inFb').value = d.fb || "";
                         document.getElementById('inWa').value = d.wa || "";
                     }
-                });
+                }).catch(e => console.log(e));
+            } else {
+                document.getElementById('formTitle').innerHTML = "<i class='fas fa-id-card'></i> ডোনার প্রোফাইল সেটআপ";
+                document.getElementById('saveBtn').innerHTML = "<i class='fas fa-upload'></i> পাবলিশ করুন";
+                document.querySelectorAll('input, textarea').forEach(input => input.value = '');
+                document.getElementById('inCanDonate').value = "হ্যাঁ";
             }
         }
 
         function showFeed() {
             document.getElementById('regPage').style.display = 'none';
-            document.getElementById('statsArea').style.display = 'grid'; // স্ট্যাটাস বক্স দেখাবে
+            document.getElementById('statsArea').style.display = 'grid'; 
             document.getElementById('filterTabs').style.display = 'flex';
             document.getElementById('donorList').style.display = 'block';
             document.getElementById('navHome').classList.add('active');
@@ -350,7 +511,13 @@
             updateUI();
         }
 
-        window.onload = () => { if(myKey) showFeed(); else loadDonors(); };
+        window.onload = () => { 
+            if(myKey) {
+                showFeed(); 
+            } else { 
+                showReg(); 
+            }
+        };
     </script>
 </body>
 </html>
