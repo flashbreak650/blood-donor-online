@@ -476,6 +476,55 @@ document.getElementById('pwa-close').onclick = () => {
 
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
+    <!-- JavaScript শুরু -->
+<script>
+    // ১. সার্ভিস ওয়ার্কার রেজিস্টার করা (এটি ২ নম্বর ধাপের জন্য জরুরি)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("Service Worker Registered"))
+        .catch((err) => console.log("Service Worker Failed", err));
+    }
+
+    let deferredPrompt;
+    const pwaPopup = document.getElementById('pwa-popup');
+    const pwaCard = document.querySelector('.pwa-card');
+    const btnInstall = document.getElementById('pwa-install');
+    const btnClose = document.getElementById('pwa-close');
+
+    // ২. ব্রাউজার যখন ইনস্টল করার জন্য রেডি হবে
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // ১ সেকেন্ড পর এনিমেশন সহ পপ-আপ দেখাবে
+        setTimeout(() => {
+            if(pwaPopup) {
+                pwaPopup.style.display = 'flex';
+                setTimeout(() => pwaCard.classList.add('active'), 50);
+            }
+        }, 1000); 
+    });
+
+    // ৩. ডাউনলোড বাটনে ক্লিক করলে যা হবে
+    btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            pwaPopup.style.display = 'none';
+        } else {
+            // যদি ব্রাউজার রেডি না থাকে তবে ম্যানুয়াল নিয়ম দেখাবে
+            alert("ইনস্টল করতে ব্রাউজারের মেনু থেকে 'Install app' বা 'Add to Home screen' এ ক্লিক করুন।");
+        }
+    });
+
+    // ৪. পরে করবো বা ক্লোজ বাটন
+    btnClose.addEventListener('click', () => {
+        pwaCard.classList.remove('active');
+        setTimeout(() => pwaPopup.style.display = 'none', 400);
+    });
+</script>
+<!-- JavaScript শেষ -->
 </body> <!-- পপ-আপ নোটিশ -->
 <div id="pwa-popup" class="pwa-overlay">
     <div class="pwa-card">
