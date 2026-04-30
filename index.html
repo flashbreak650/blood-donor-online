@@ -231,24 +231,27 @@
             if (input.classList.contains('active')) { input.focus(); icon.classList.replace('fa-search', 'fa-times'); } else { input.value = ""; icon.classList.replace('fa-times', 'fa-search'); loadDonors(); }
         }
 
-        function refreshHeader() {
-            if (myKey) {
-                document.getElementById('mainHeader').style.display = 'flex';
-                document.getElementById('topActionArea').style.display = 'flex';
-                database.ref('donors/' + myKey).once('value').then(snap => {
-                    const data = snap.val();
-                    if (data) {
-                        document.getElementById('topNameLabel').innerText = data.name;
-                        document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
-                    } else {
-                        localStorage.removeItem('myDonorKey'); myKey = null; location.reload();
-                    }
-                }).catch(err => console.log(err));
+      function refreshHeader() {
+    // এই দুটি লাইন সবসময় 'flex' থাকবে, অ্যাকাউন্ট থাকুক বা না থাকুক
+    document.getElementById('mainHeader').style.display = 'flex';
+    document.getElementById('topActionArea').style.display = 'flex';
+
+    if (myKey) {
+        database.ref('donors/' + myKey).once('value').then(snap => {
+            const data = snap.val();
+            if (data) {
+                document.getElementById('topNameLabel').innerText = data.name;
+                document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
             } else {
-                document.getElementById('mainHeader').style.display = 'none';
-                document.getElementById('topActionArea').style.display = 'none';
+                localStorage.removeItem('myDonorKey'); myKey = null; location.reload();
             }
-        }
+        }).catch(err => console.log(err));
+    } else {
+        // অ্যাকাউন্ট না থাকলে ডিফল্ট লেখা দেখাবে
+        document.getElementById('topNameLabel').innerText = "Registration";
+        document.getElementById('topAvatarImg').src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    }
+}
 
         window.addEventListener('load', refreshHeader);
 
