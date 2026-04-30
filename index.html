@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="bn">
-<head> 
+<head> <link rel="manifest" href="manifest.json">
 <!-- Open Graph / Facebook Meta Tags -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://blood-donor-online.netlify.app/">
@@ -434,5 +434,103 @@
 
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
-</body>
+</body> <!-- পপ-আপ নোটিশ -->
+<div id="pwa-popup" class="pwa-overlay">
+    <div class="pwa-card">
+        <div class="pwa-icon">📲</div>
+        <h2>App ইনস্টল করুন</h2>
+        <p>সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
+        <div class="pwa-buttons">
+            <button id="pwa-install" class="btn-download">ডাউনলোড করুন</button>
+            <button id="pwa-close" class="btn-close">পরে করবো</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* এনিমেশন এবং ডিজাইন */
+.pwa-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none; /* শুরুতে লুকানো থাকবে */
+    align-items: center; justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.pwa-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: scale(0.7);
+    opacity: 0;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pwa-card.active {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.pwa-icon { font-size: 50px; margin-bottom: 10px; }
+
+.btn-download {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    color: #666;
+    margin-top: 10px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+<script>
+let deferredPrompt;
+const pwaPopup = document.getElementById('pwa-popup');
+const pwaCard = document.querySelector('.pwa-card');
+const btnInstall = document.getElementById('pwa-install');
+const btnClose = document.getElementById('pwa-close');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // সাইটে ঢোকার ২ সেকেন্ড পর পপ-আপ দেখাবে
+    setTimeout(() => {
+        pwaPopup.style.display = 'flex';
+        setTimeout(() => pwaCard.classList.add('active'), 10);
+    }, 2000); 
+});
+
+btnInstall.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        hidePopup();
+    }
+});
+
+btnClose.addEventListener('click', hidePopup);
+
+function hidePopup() {
+    pwaCard.classList.remove('active');
+    setTimeout(() => pwaPopup.style.display = 'none', 400);
+}
+</script>
+
+</style>
 </html> 
