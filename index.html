@@ -3,473 +3,155 @@
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Donor Online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <style>
+    /* অ্যান্টি-কপি স্টাইল (টেক্সট সিলেক্ট করা যাবে না) */
+    body {
+        -webkit-user-select: none; 
+        -moz-user-select: none; 
+        -ms-user-select: none; 
+        user-select: none; 
+    }
+    
+    :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; }
+    body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; padding-bottom: 90px; margin: 0; overflow-x: hidden; }
 
     /* প্রিমিয়াম মাস্টার হেডার ডিজাইন */
-    .master-app-bar {
-        width: 100%;
-        max-width: 450px;
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 12px 18px;
-        display: flex;
-        justify-content: space-between; /* নাম বামে এবং প্রোফাইল ডানে সরাবে */
-        align-items: center;
-        box-sizing: border-box;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        border: 1px solid #f0f0f0;
-    }
+    .master-app-bar { width: 100%; max-width: 450px; background: #ffffff; border-radius: 20px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+    .brand-side h1 { margin: 0; font-size: 19px; font-weight: 900; color: #2b2d42; letter-spacing: 0.5px; text-transform: uppercase; }
+    .brand-side span { font-size: 10px; color: #d90429; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+    .status-blink { width: 7px; height: 7px; background: #d90429; border-radius: 50%; animation: blinker 1.5s infinite; }
+    .user-profile-side { display: flex; align-items: center; gap: 10px; background: #fdf2f2; padding: 5px 12px; border-radius: 40px; border: 1px solid #fee2e2; cursor: pointer; }
+    .user-text h2 { margin: 0; font-size: 14px; font-weight: 800; color: #333; text-align: right; }
+    .user-text span { font-size: 9px; color: #d90429; font-weight: bold; display: block; text-align: right; }
+    .user-img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #d90429; background: #fff; }
+    @keyframes blinker { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* বাম পাশের ওয়েবসাইট নাম */
-    .brand-side h1 {
-        margin: 0;
-        font-size: 19px;
-        font-weight: 900;
-        color: #2b2d42;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-    .brand-side span {
-        font-size: 10px;
-        color: #d90429;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .status-blink {
-        width: 7px;
-        height: 7px;
-        background: #d90429;
-        border-radius: 50%;
-        animation: blinker 1.5s infinite;
-    }
-
-    /* ডান পাশের ডোনার প্রোফাইল কার্ড */
-    .user-profile-side {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: #fdf2f2;
-        padding: 5px 12px;
-        border-radius: 40px;
-        border: 1px solid #fee2e2;
-        cursor: pointer;
-    }
-    .user-text h2 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 800;
-        color: #333;
-        text-align: right;
-    }
-    .user-text span {
-        font-size: 9px;
-        color: #d90429;
-        font-weight: bold;
-        display: block;
-        text-align: right;
-    }
-    .user-img {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: 2px solid #d90429;
-        background: #fff;
-    }
-
-    @keyframes blinker {
-        0% { opacity: 1; }
-        50% { opacity: 0.3; }
-        100% { opacity: 1; }
-    }
-</style>  
-<style>
-/* স্ট্যাটাস বক্সগুলোকে ফিল্টার বাটনের মতো ছোট করার কোড */
-.stats-container {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    width: 100% !important;
-    max-width: 450px !important;
-    margin: 0 auto 12px auto !important;
-    padding: 0 5px !important;
-}
-
-.stat-box {
-    flex: 1 !important;
-    background: white !important;
-    padding: 8px 4px !important; /* ফিল্টার বাটনের মতো উচ্চতা */
-    border-radius: 20px !important; /* গোল বর্ডার */
-    text-align: center !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-    border: none !important;
-    display: flex !important;
-    flex-direction: row !important; /* সংখ্যা এবং লেখা এক লাইনে */
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 4px !important;
-}
-
-.stat-box b {
-    font-size: 11px !important; /* ফিল্টার বাটনের ফন্ট সাইজ */
-    color: var(--primary) !important;
-    line-height: 1 !important;
-}
-
-.stat-box span {
-    font-size: 11px !important; /* ফিল্টার বাটনের ফন্ট সাইজ */
-    color: var(--gray) !important;
-    font-weight: bold !important;
-}
-    .hb-share-mini {
-        background: #d90429;
-        color: white;
-        border: none;
-        padding: 5px 12px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: bold;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin: 10px 0;
-        position: relative;
-        overflow: hidden;
-    }
-    .hb-share-mini:active { transform: scale(0.95); }
+    /* স্ট্যাটাস বক্সগুলোকে ফিল্টার বাটনের মতো ছোট করার কোড */
+    .stats-container { display: flex !important; justify-content: center !important; gap: 6px !important; width: 100% !important; max-width: 450px !important; margin: 0 auto 12px auto !important; padding: 0 5px !important; }
+    .stat-box { flex: 1 !important; background: white !important; padding: 8px 4px !important; border-radius: 20px !important; text-align: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; border: none !important; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; gap: 4px !important; }
+    .stat-box b { font-size: 11px !important; color: var(--primary) !important; line-height: 1 !important; }
+    .stat-box span { font-size: 11px !important; color: var(--gray) !important; font-weight: bold !important; }
     
-    #copyToast {
-        visibility: hidden;
-        background: #333;
-        color: #fff;
-        text-align: center;
-        padding: 8px 15px;
-        position: fixed;
-        bottom: 85px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 20px;
-        font-size: 12px;
-        z-index: 10000;
-    }
+    #copyToast { visibility: hidden; background: #333; color: #fff; text-align: center; padding: 8px 15px; position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); border-radius: 20px; font-size: 12px; z-index: 10000; }
     #copyToast.show { visibility: visible; animation: fadeHB 2.5s; }
     @keyframes fadeHB { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
-</style>
 
+    .action-bar-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin: 15px 0; width: 100%; max-width: 450px; }
+    .copy-btn-main { background: #d90429; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); display: flex; align-items: center; gap: 8px; }
+    .search-box-wrapper { display: flex; align-items: center; position: relative; }
+    .search-field { width: 0; opacity: 0; height: 40px; border: none; border-radius: 25px; outline: none; transition: all 0.4s ease; background: #fff; font-size: 14px; }
+    .search-field.active { width: 200px; opacity: 1; padding: 0 15px; margin-right: -45px; border: 2px solid #d90429; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .search-circle-btn { width: 48px; height: 48px; background: #fff; color: #d90429; border: 2px solid #eee; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 2; transition: 0.3s; }
+    .search-circle-btn.active { background: #d90429; color: #fff; border-color: #d90429; }
 
-<div class="action-bar-container">
-    <button class="copy-btn-main" onclick="copyMySite(event)">
-        <i class="fas fa-link"></i> Share
-    </button>
+    /* নতুন ফিল্টার বাটন ও কন্টেইনার */
+    .filter-container { display: flex; gap: 5px; width: 100%; max-width: 450px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
+    .filter-btn { flex: 1; padding: 8px 8px; border: none; border-radius: 20px; background: white; color: var(--gray); font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap; }
+    .filter-btn.active { background: var(--primary); color: white; }
 
-    <div class="search-box-wrapper">
-        <input type="text" id="searchInput" class="search-field" placeholder="খুঁজুন..." onkeyup="loadDonors()">
-        <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
-            <i class="fas fa-search" id="searchIcon"></i>
-        </button>
-    </div>
-</div>
-
-<div id="copyToast">কপি করা হয়েছে</div>
-
-<script>
-function copyMySite(e) {
-    const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://blood-donor-online.netlify.app/";
+    #regPage { background: white; width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .reg-title { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 18px; font-weight: bold; }
+    .reg-subtitle { text-align: center; color: #dc2626; font-size: 10px; margin-bottom: 15px; font-weight: bold; }
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group.full { grid-column: 1 / 3; }
+    .input-group label { font-size: 11px; font-weight: bold; color: var(--gray); display: block; margin-bottom: 3px; }
+    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 13px; outline: none; }
     
-    // কপি করার মূল লজিক
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(infoText).then(() => {
-            showHBToast();
-        }).catch(err => {
-            fallbackCopy(infoText);
-        });
-    } else {
-        fallbackCopy(infoText);
-    }
+    #donorList { width: 100%; max-width: 450px; }
 
-    // ক্লিক এনিমেশন
-    const btn = e.currentTarget;
-    const circle = document.createElement("span");
-    circle.style.width = circle.style.height = "50px";
-    circle.style.position = "absolute";
-    circle.style.background = "rgba(255,255,255,0.3)";
-    circle.style.borderRadius = "50%";
-    circle.style.left = "50%";
-    circle.style.top = "50%";
-    circle.style.transform = "translate(-50%, -50%) scale(0)";
-    circle.style.animation = "rippleHB 0.4s linear";
-    btn.appendChild(circle);
-    setTimeout(() => circle.remove(), 400);
-}
+    .donor-card { background: white; width: 100%; border-radius: 12px; box-sizing: border-box; padding: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border: 1px solid #eef0f2; margin-bottom: 15px; position: relative; animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-function fallbackCopy(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-        document.execCommand('copy');
-        showHBToast();
-    } catch (err) {
-        alert("কপি করা সম্ভব হচ্ছে না");
-    }
-    document.body.removeChild(textArea);
-}
+    .fav-heart { position: absolute; top: 15px; right: 80px; font-size: 18px; color: #ddd; cursor: pointer; transition: 0.3s; }
+    .fav-heart.active { color: var(--primary); transform: scale(1.2); }
 
-function showHBToast() {
-    const toast = document.getElementById("copyToast");
-    toast.className = "show";
-    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
-}
-</script>
-
-<style> .action-bar-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin: 15px 0;
-    width: 100%;
-}
-
-/* কপি বাটন ডিজাইন */
-.copy-btn-main {
-    background: #d90429;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* সার্চ বক্স র‍্যাপার */
-.search-box-wrapper {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-/* ইনপুট ফিল্ড স্লাইডিং অ্যানিমেশন */
-.search-field {
-    width: 0;
-    opacity: 0;
-    height: 40px;
-    border: none;
-    border-radius: 25px;
-    outline: none;
-    transition: all 0.4s ease;
-    background: #fff;
-    font-size: 14px;
-}
-
-.search-field.active {
-    width: 200px;
-    opacity: 1;
-    padding: 0 15px;
-    margin-right: -45px;
-    border: 2px solid #d90429;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* সাদা গোল বাটন */
-.search-circle-btn {
-    width: 48px;
-    height: 48px;
-    background: #fff;
-    color: #d90429;
-    border: 2px solid #eee;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    z-index: 2;
-    transition: 0.3s;
-}
-
-.search-circle-btn.active {
-    background: #d90429;
-    color: #fff;
-    border-color: #d90429;
-}
-@keyframes rippleHB { to { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
-</style>
-
-
-
-<div id="mainHeader" class="master-app-bar" style="display: none;">
-    <div class="brand-side">
-        <h1>BLOOD web </h1>
-        <span><span class="status-blink"></span> Online</span>
-    </div>
-
-    <div class="user-profile-side" onclick="showReg()">
-        <div class="user-text">
-            <h2 id="topNameLabel">লোড হচ্ছে..</h2>
-            <span>আমার প্রোফাইল</span>
-        </div>
-        <img id="topAvatarImg" src="" class="user-img">
-    </div>
-</div>
-
-    <style>  /* সার্চ বক্স ও বাটন ছোট করার প্রিমিয়াম স্টাইল */
-.search-wrapper {
-    width: 100%; max-width: 450px; margin-bottom: 10px;
-    display: flex; justify-content: flex-end; align-items: center;
-}
-.search-input {
-    width: 0; opacity: 0; padding: 8px; border: 1px solid var(--primary);
-    border-radius: 20px; outline: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 13px;
-}
-.search-input.active { width: 100%; opacity: 1; margin-right: 10px; }
-.search-btn {
-    background: var(--primary); color: white; border: none;
-    width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2);
-}
-
-.filter-container { display: flex; gap: 6px; width: 100%; max-width: 450px; margin-bottom: 12px; }
-.filter-btn { 
-    flex: 1; padding: 8px 4px; border: none; border-radius: 20px; 
-    background: white; color: var(--gray); font-size: 11px; 
-    font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-}
-.filter-btn.active { background: var(--primary); color: white; }
-
-.btn-del-card { 
-    background: #444 !important; font-size: 10px !important; 
-    padding: 4px 10px !important; width: fit-content !important; 
-    margin: 5px auto 0 !important; border-radius: 5px !important;
-}
-        :root {
-            --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703;
-        }
-
-        body {
-            background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif;
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 15px; padding-bottom: 90px; margin: 0;
-            overflow-x: hidden;
-        }
-
-        .stats-container {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; 
-            width: 100%; max-width: 450px; margin-bottom: 15px;
-        }
-        .stat-box {
-            background: white; padding: 12px 5px; border-radius: 8px; 
-            text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .stat-box b { display: block; font-size: 18px; color: var(--primary); margin-bottom: 3px; }
-        .stat-box span { font-size: 11px; color: var(--gray); font-weight: bold; }
-
-        .filter-container { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-bottom: 15px; }
-        .filter-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: white; color: var(--gray); font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .filter-btn.active { background: var(--primary); color: white; }
-
-        #regPage {
-            background: white; width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box;
-            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;
-        }
-        .reg-title { text-align: center; color: var(--primary); margin-bottom: 15px; font-size: 18px; font-weight: bold; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .input-group { margin-bottom: 10px; }
-        .input-group.full { grid-column: 1 / 3; }
-        .input-group label { font-size: 11px; font-weight: bold; color: var(--gray); display: block; margin-bottom: 3px; }
-        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 13px; outline: none; }
-        
-        #donorList { width: 100%; max-width: 450px; }
-
-        .donor-card {
-            background: white; width: 100%; border-radius: 12px; box-sizing: border-box;
-            padding: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border: 1px solid #eef0f2;
-            margin-bottom: 15px; position: relative; animation: slideUp 0.4s ease-out;
-        }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .fav-heart { position: absolute; top: 15px; right: 80px; font-size: 18px; color: #ddd; cursor: pointer; transition: 0.3s; }
-        .fav-heart.active { color: var(--primary); transform: scale(1.2); }
-
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .profile-part { display: flex; gap: 12px; }
-        .avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
-        .name-area h3 { margin: 0; font-size: 16px; color: #2b2d42; display: flex; align-items: center; gap: 5px; }
-        
-        .social-row { display: flex; gap: 12px; margin-top: 6px; }
-        .social-row a { font-size: 18px; text-decoration: none; }
-        .fa-facebook { color: #1877F2; } .fa-whatsapp { color: #25D366; }
-
-        .blood-group-badge { background: var(--primary); color: white; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 14px; text-align: center; }
-        
-        .availability-tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; margin: 8px 0; }
-        .status-yes { background: #e9f5ec; color: var(--success); }
-        .status-no { background: #fee2e2; color: #dc2626; }
-        
-        .extra-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; background: #fff5f5; padding: 10px; border-radius: 8px; border: 1px dashed var(--primary); }
-        .stats-row { display: flex; gap: 15px; font-size: 11px; color: var(--gray); background: #f8f9fa; padding: 8px; border-radius: 8px; margin: 12px 0; }
-        
-        .review-section { border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 12px; text-align: center; }
-        .star-box { display: flex; justify-content: center; gap: 5px; color: #ddd; font-size: 18px; cursor: pointer; }
-        .star-box .active { color: var(--star); }
-
-        .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
-        .btn-follow { background: #eef2ff; color: #4338ca; }
-        .btn-follow.active { background: #4338ca; color: white; }
-        .btn-call { background: var(--primary); color: white; }
-        .btn-del-card { background: #333; color: white; grid-column: 1 / 3; margin-top: 5px; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 450px; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; z-index: 1000; }
-        .nav-item { border: none; background: none; color: var(--gray); font-size: 20px; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-
-        /* এম্পটি স্টেট (যদি কোনো ডোনার না থাকে) */
-        .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .profile-part { display: flex; gap: 12px; }
+    .avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+    .name-area h3 { margin: 0; font-size: 16px; color: #2b2d42; display: flex; align-items: center; gap: 5px; }
     
+    .social-row { display: flex; gap: 12px; margin-top: 6px; }
+    .social-row a { font-size: 18px; text-decoration: none; }
+    .fa-facebook { color: #1877F2; } .fa-whatsapp { color: #25D366; }
+
+    .blood-group-badge { background: var(--primary); color: white; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 14px; text-align: center; }
+    
+    .availability-tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; margin: 8px 0; }
+    .status-yes { background: #e9f5ec; color: var(--success); }
+    .status-no { background: #fee2e2; color: #dc2626; }
+    
+    .extra-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; background: #fff5f5; padding: 10px; border-radius: 8px; border: 1px dashed var(--primary); }
+    .stats-row { display: flex; gap: 15px; font-size: 11px; color: var(--gray); background: #f8f9fa; padding: 8px; border-radius: 8px; margin: 12px 0; }
+    
+    .review-section { border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 12px; text-align: center; }
+    .star-box { display: flex; justify-content: center; gap: 5px; color: #ddd; font-size: 18px; cursor: pointer; }
+    .star-box .active { color: var(--star); }
+
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn { border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+    .btn-follow { background: #eef2ff; color: #4338ca; }
+    .btn-follow.active { background: #4338ca; color: white; }
+    .btn-call { background: var(--primary); color: white; }
+    .btn-del-card { background: #333 !important; color: white; grid-column: 1 / 3; margin-top: 5px; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 450px; background: white; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; z-index: 1000; }
+    .nav-item { border: none; background: none; color: var(--gray); font-size: 20px; cursor: pointer; }
+    .nav-item.active { color: var(--primary); }
+
+    .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;"> <div id="mainHeader" class="master-app-bar" style="display: none;">
+        <div class="brand-side">
+            <h1>BLOOD web </h1>
+            <span><span class="status-blink"></span> Online</span>
+        </div>
+
+        <div class="user-profile-side" onclick="showReg()">
+            <div class="user-text">
+                <h2 id="topNameLabel">লোড হচ্ছে..</h2>
+                <span>আমার প্রোফাইল</span>
+            </div>
+            <img id="topAvatarImg" src="" class="user-img">
+        </div>
+    </div>
+
+    <div class="action-bar-container" id="topActionArea" style="display: none;">
+        <button class="copy-btn-main" onclick="copyMySite(event)">
+            <i class="fas fa-link"></i> Share
+        </button>
+
+        <div class="search-box-wrapper">
+            <input type="text" id="searchInput" class="search-field" placeholder="নাম বা গ্রুপ খুঁজুন..." onkeyup="loadDonors()">
+            <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
+                <i class="fas fa-search" id="searchIcon"></i>
+            </button>
+        </div>
+    </div>
+    <div id="copyToast">কপি করা হয়েছে</div>
 
     <div class="stats-container" id="statsArea" style="display: none;">
-        <div class="stat-box">
-            <b id="countTotal">0</b>
-            <span>মোট ডোনার</span>
-        </div>
-        <div class="stat-box">
-            <b id="countOnline" style="color: var(--success);">0</b>
-            <span>অ্যাক্টিভ</span>
-        </div>
-        <div class="stat-box">
-            <b id="countOffline" style="color: #dc2626;">0</b>
-            <span>অফলাইন</span>
-        </div>
+        <div class="stat-box"><b id="countTotal">0</b><span>মোট ডোনার</span></div>
+        <div class="stat-box"><b id="countOnline" style="color: var(--success);">0</b><span>অ্যাক্টিভ</span></div>
+        <div class="stat-box"><b id="countOffline" style="color: #dc2626;">0</b><span>অফলাইন</span></div>
     </div>
 
     <div class="filter-container" id="filterTabs" style="display: none;">
-        <button type="button" class="filter-btn active" onclick="setFilter('হ্যাঁ', this)">সক্রিয় লিস্ট</button>
+        <button type="button" class="filter-btn active" onclick="setFilter('all', this)">সব পোস্ট</button>
+        <button type="button" class="filter-btn" onclick="setFilter('হ্যাঁ', this)">সক্রিয় লিস্ট</button>
         <button type="button" class="filter-btn" onclick="setFilter('না', this)">অফলাইন লিস্ট</button>
         <button type="button" class="filter-btn" onclick="setFilter('fav', this)">ফেভারিট</button>
     </div>
 
     <div id="regPage">
         <div class="reg-title" id="formTitle"><i class="fas fa-id-card"></i> ডোনার প্রোফাইল সেটআপ</div>
+        <div class="reg-subtitle" id="formSubtitle">একটি ফোন থেকে একটি অ্যাকাউন্ট করা যাবে</div>
         <div class="input-grid">
             <div class="input-group full"><label><i class="fas fa-user"></i> নাম</label><input type="text" id="inName" placeholder="আপনার নাম"></div>
             <div class="input-group"><label><i class="fas fa-tint"></i> রক্তের গ্রুপ</label><input type="text" id="inBlood" placeholder="A+"></div>
@@ -504,152 +186,122 @@ function showHBToast() {
         <button type="button" id="navReg" class="nav-item active" onclick="showReg()"><i class="fas fa-user-edit"></i></button>
     </div>
 
-    <script> 
-    // সার্চ বক্স টগল ফাংশন
-function toggleSearch() {
-    const input = document.getElementById('searchInput');
-    const btn = document.getElementById('searchBtn');
-    const icon = document.getElementById('searchIcon');
+    <script>
+        // অ্যান্টি-কপি: কীবোর্ড শর্টকাট বন্ধ করা হলো
+        document.addEventListener('keydown', function(e) {
+            if(e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
+            if(e.key === 'F12') { e.preventDefault(); return false; }
+        });
 
-    input.classList.toggle('active');
-    btn.classList.toggle('active');
-
-    if (input.classList.contains('active')) {
-        input.focus();
-        icon.classList.replace('fa-search', 'fa-times'); // সার্চ আইকন ক্রস হয়ে যাবে
-    } else {
-        input.value = "";
-        icon.classList.replace('fa-times', 'fa-search');
-        loadDonors(); // বক্স বন্ধ করলে সব লিস্ট আবার আসবে
-    }
-}
-
-// আপনার loadDonors() ফাংশনে এই সার্চ লজিকটি অ্যাড করে দিন:
-// if (searchText && !data.name.toLowerCase().includes(searchText) && !data.blood.toLowerCase().includes(searchText)) return;
-    
-        const firebaseConfig = {
-            apiKey: "AIzaSyBrWesq_t5fvUPcCfwKDdpIjBaHumhQg-g",
-            databaseURL: "https://blood-donor-online-default-rtdb.firebaseio.com",
-            projectId: "blood-donor-online",
-        };
+        // ফায়ারবেস কনফিগারেশন লুকানো (Base64 Encode)
+        const _0xdbKey = "eyJhcGlLZXkiOiJBSXphU3lCcldlc3FfdDVmdVVQY0Nmd0tEZHBJakJhSHVtaFFnLWciLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYmxvb2QtZG9ub3Itb25saW5lLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbSIsInByb2plY3RJZCI6ImJsb29kLWRvbm9yLW9ubGluZSJ9";
+        const firebaseConfig = JSON.parse(atob(_0xdbKey));
         
-        // ফায়ারবেস ইনিশিয়ালাইজেশন
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
         let myKey = localStorage.getItem('myDonorKey');
-        let currentFilter = 'হ্যাঁ'; // আপনার ডিজাইনের ডিফল্ট ফিল্টার
+        let currentFilter = 'all'; // ডিফল্ট "সব পোস্ট" দেখাবে
         let favList = JSON.parse(localStorage.getItem('myFavDonors')) || [];
 
-        // প্রোফাইল হেডার লোডিং ফিক্স
+        function copyMySite(e) {
+            const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://blood-donor-online.netlify.app/";
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(infoText).then(() => { showHBToast(); }).catch(err => { fallbackCopy(infoText); }); } else { fallbackCopy(infoText); }
+            const btn = e.currentTarget; const circle = document.createElement("span"); circle.style.width = circle.style.height = "50px"; circle.style.position = "absolute"; circle.style.background = "rgba(255,255,255,0.3)"; circle.style.borderRadius = "50%"; circle.style.left = "50%"; circle.style.top = "50%"; circle.style.transform = "translate(-50%, -50%) scale(0)"; circle.style.animation = "rippleHB 0.4s linear"; btn.appendChild(circle); setTimeout(() => circle.remove(), 400);
+        }
+
+        function fallbackCopy(text) { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select(); try { document.execCommand('copy'); showHBToast(); } catch (err) { alert("কপি করা সম্ভব হচ্ছে না"); } document.body.removeChild(textArea); }
+        function showHBToast() { const toast = document.getElementById("copyToast"); toast.className = "show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500); }
+
+        function toggleSearch() {
+            const input = document.getElementById('searchInput'); const btn = document.getElementById('searchBtn'); const icon = document.getElementById('searchIcon');
+            input.classList.toggle('active'); btn.classList.toggle('active');
+            if (input.classList.contains('active')) { input.focus(); icon.classList.replace('fa-search', 'fa-times'); } else { input.value = ""; icon.classList.replace('fa-times', 'fa-search'); loadDonors(); }
+        }
+
         function refreshHeader() {
             if (myKey) {
                 document.getElementById('mainHeader').style.display = 'flex';
+                document.getElementById('topActionArea').style.display = 'flex';
                 database.ref('donors/' + myKey).once('value').then(snap => {
                     const data = snap.val();
                     if (data) {
                         document.getElementById('topNameLabel').innerText = data.name;
                         document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
                     } else {
-                        // যদি ডেটাবেস থেকে ডিলিট হয়ে যায়, কিন্তু ব্রাউজারে কি সেভ থাকে
-                        localStorage.removeItem('myDonorKey');
-                        myKey = null;
-                        document.getElementById('mainHeader').style.display = 'none';
+                        localStorage.removeItem('myDonorKey'); myKey = null; location.reload();
                     }
                 }).catch(err => console.log(err));
             } else {
                 document.getElementById('mainHeader').style.display = 'none';
+                document.getElementById('topActionArea').style.display = 'none';
             }
         }
 
         window.addEventListener('load', refreshHeader);
 
         function saveToOnline() {
-            const btn = document.getElementById('saveBtn');
-            const originalText = btn.innerHTML;
-            
+            const btn = document.getElementById('saveBtn'); const originalText = btn.innerHTML;
             const data = {
-                name: document.getElementById('inName').value,
-                blood: document.getElementById('inBlood').value,
-                type: document.getElementById('inType').value,
-                loc: document.getElementById('inLoc').value,
-                phone: document.getElementById('inPhone').value,
-                weight: document.getElementById('inWeight').value,
-                last: document.getElementById('inLast').value,
-                times: document.getElementById('inTimes').value,
-                canDonate: document.getElementById('inCanDonate').value,
-                bio: document.getElementById('inBio').value,
-                fb: document.getElementById('inFb').value,
-                wa: document.getElementById('inWa').value,
-                rating: 80,
-                followers: 2
+                name: document.getElementById('inName').value, blood: document.getElementById('inBlood').value, type: document.getElementById('inType').value, loc: document.getElementById('inLoc').value,
+                phone: document.getElementById('inPhone').value, weight: document.getElementById('inWeight').value, last: document.getElementById('inLast').value, times: document.getElementById('inTimes').value,
+                canDonate: document.getElementById('inCanDonate').value, bio: document.getElementById('inBio').value, fb: document.getElementById('inFb').value, wa: document.getElementById('inWa').value, rating: 80, followers: 2
             };
 
-            if(!data.name || !data.phone) { 
-                alert("দয়া করে আপনার নাম ও ফোন নম্বর দিন!"); 
-                return; 
-            }
+            if(!data.name || !data.phone) { alert("দয়া করে আপনার নাম ও ফোন নম্বর দিন!"); return; }
 
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> আপডেট হচ্ছে...";
-            btn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> আপডেট হচ্ছে..."; btn.disabled = true;
 
             const ref = myKey ? database.ref('donors/' + myKey) : database.ref('donors/').push();
             
             ref.set(data).then(() => {
-                localStorage.setItem('myDonorKey', ref.key);
-                myKey = ref.key;
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                localStorage.setItem('myDonorKey', ref.key); myKey = ref.key;
+                btn.innerHTML = originalText; btn.disabled = false;
                 alert("আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!"); 
-                refreshHeader(); // সেভ করার পর হেডার আপডেট করবে
+                refreshHeader(); 
+                setFilter('all', document.querySelector('.filter-btn')); // অ্যাকাউন্ট করলে সব পোস্টে চলে যাবে
                 showFeed(); 
             }).catch((error) => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                alert("আপডেট ব্যর্থ হয়েছে! সমস্যা: " + error.message);
+                btn.innerHTML = originalText; btn.disabled = false; alert("আপডেট ব্যর্থ হয়েছে!");
             });
         }
 
         function loadDonors() {
-            // আগের লিসেনার মুছে ফেলা হলো যাতে ফিল্টার বাটন হ্যাং না করে
             database.ref('donors/').off('value'); 
+            const searchText = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : "";
             
             database.ref('donors/').on('value', (snapshot) => {
-                const list = document.getElementById('donorList');
-                list.innerHTML = ""; 
-                
-                let totalDonors = 0;
-                let onlineDonors = 0;
-                let offlineDonors = 0;
+                const list = document.getElementById('donorList'); list.innerHTML = ""; 
+                let totalDonors = 0, onlineDonors = 0, offlineDonors = 0;
 
                 if (!snapshot.exists()) {
-                    document.getElementById('countTotal').innerText = "0";
-                    document.getElementById('countOnline').innerText = "0";
-                    document.getElementById('countOffline').innerText = "0";
+                    document.getElementById('countTotal').innerText = "0"; document.getElementById('countOnline').innerText = "0"; document.getElementById('countOffline').innerText = "0";
                     list.innerHTML = "<div class='empty-state'><i class='fas fa-box-open fa-3x'></i><br><br>এখনো কোনো ডোনার নেই!<br>আপনি প্রথম ডোনার হিসেবে রেজিস্ট্রেশন করুন।</div>";
                     return;
                 }
 
                 snapshot.forEach((child) => {
-                    const data = child.val();
-                    const key = child.key;
+                    const data = child.val(); const key = child.key;
+                    totalDonors++; if(data.canDonate === "হ্যাঁ") { onlineDonors++; } else { offlineDonors++; }
 
-                    totalDonors++;
-                    if(data.canDonate === "হ্যাঁ") { onlineDonors++; } else { offlineDonors++; }
-
-                    // ফিল্টার বাটন কাজ করার লজিক
+                    // ফিল্টার লজিক
                     if(currentFilter === 'fav') {
                         if(!favList.includes(key)) return;
-                    } else if(data.canDonate !== currentFilter) {
-                        return; // যদি ফিল্টার 'হ্যাঁ' হয়, তাহলে 'না' গুলো বাদ পড়বে
-                       }
+                    } else if(currentFilter !== 'all' && data.canDonate !== currentFilter) {
+                        return; 
+                    }
+
+                    // সার্চ লজিক
+                    if (searchText) {
+                        const nameMatch = data.name ? data.name.toLowerCase().includes(searchText) : false;
+                        const bloodMatch = data.blood ? data.blood.toLowerCase().includes(searchText) : false;
+                        const locMatch = data.loc ? data.loc.toLowerCase().includes(searchText) : false;
+                        if (!nameMatch && !bloodMatch && !locMatch) return;
+                    }
 
                     const statusClass = (data.canDonate === "হ্যাঁ") ? "status-yes" : "status-no";
                     const statusText = (data.canDonate === "হ্যাঁ") ? "● এখন রক্ত দিতে পারবেন" : "○ এখন রক্ত দিতে পারবেন না";
                     const isFav = favList.includes(key) ? 'active' : '';
-
                     const isMyPost = (key === myKey);
 
                     list.innerHTML += `
@@ -672,7 +324,7 @@ function toggleSearch() {
                             <div class="card-body">
                                 <span class="availability-tag ${statusClass}">${statusText}</span>
                                 <div class="extra-info">
-                                    <div> ${data.loc}</div><div>ওজন:⚖️ ${data.weight}</div>
+                                    <div>📍 ${data.loc}</div><div>⚖️ ${data.weight}</div>
                                     <div>📞 ${data.phone}</div><div>🩸দান: ${data.times}</div>
                                 </div>
                                 <p style="font-size: 13px; color: #4a4a4a; margin: 8px 0; word-wrap: break-word;">${data.bio || 'জরুরি প্রয়োজনে রক্ত দান করুন।'}</p>
@@ -696,109 +348,76 @@ function toggleSearch() {
                         </div>`;
                 });
 
-                document.getElementById('countTotal').innerText = totalDonors;
-                document.getElementById('countOnline').innerText = onlineDonors;
-                document.getElementById('countOffline').innerText = offlineDonors;
-            }, (error) => {
-                alert("ডাটাবেস লোড হতে সমস্যা হচ্ছে! এরর: " + error.message);
+                document.getElementById('countTotal').innerText = totalDonors; document.getElementById('countOnline').innerText = onlineDonors; document.getElementById('countOffline').innerText = offlineDonors;
             });
         }
 
         function setFilter(val, btn) {
             currentFilter = val;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            if(btn) btn.classList.add('active');
             loadDonors();
         }
 
         function toggleFav(key) {
-            if(favList.includes(key)) favList = favList.filter(id => id !== key);
-            else favList.push(key);
-            localStorage.setItem('myFavDonors', JSON.stringify(favList));
-            loadDonors();
+            if(favList.includes(key)) favList = favList.filter(id => id !== key); else favList.push(key);
+            localStorage.setItem('myFavDonors', JSON.stringify(favList)); loadDonors();
         }
 
         function follow(key) {
             database.ref('donors/' + key + '/followers').transaction(c => (c || 0) + 1);
-            document.getElementById('fBtn-'+key).innerHTML = "<i class='fas fa-check'></i> Following";
-            document.getElementById('fBtn-'+key).classList.add('active');
+            document.getElementById('fBtn-'+key).innerHTML = "<i class='fas fa-check'></i> Following"; document.getElementById('fBtn-'+key).classList.add('active');
         }
 
-        function giveRating(key) {
-            database.ref('donors/' + key + '/rating').set(95);
-            alert("রেটিং দেওয়ার জন্য ধন্যবাদ!");
-        }
+        function giveRating(key) { database.ref('donors/' + key + '/rating').set(95); alert("রেটিং দেওয়ার জন্য ধন্যবাদ!"); }
 
         function deletePost(key) {
-            if(confirm("ডিলিট করতে চান?")) {
+            if(confirm("অ্যাকাউন্ট ডিলিট করতে চান? ডিলিট করলে আপনি আবার নতুন অ্যাকাউন্ট করতে পারবেন।")) {
                 database.ref('donors/' + key).remove().then(() => {
-                    localStorage.removeItem('myDonorKey');
-                    myKey = null;
-                    alert("আপনার প্রোফাইল মুছে ফেলা হয়েছে।");
-                    refreshHeader();
-                    showReg();
+                    localStorage.removeItem('myDonorKey'); myKey = null; alert("আপনার প্রোফাইল মুছে ফেলা হয়েছে।"); location.reload();
                 });
             }
         }
 
         function updateUI() {
             if(myKey) {
-                document.getElementById('formTitle').innerHTML = "<i class='fas fa-user-cog'></i> প্রোফাইল এডিট করুন";
-                document.getElementById('saveBtn').innerHTML = "<i class='fas fa-upload'></i> পোস্ট আপডেট করুন";
+                document.getElementById('formTitle').innerHTML = "<i class='fas fa-user-cog'></i> প্রোফাইল আপডেট করুন";
+                document.getElementById('formSubtitle').innerText = "নতুন অ্যাকাউন্ট করতে হলে বর্তমান অ্যাকাউন্ট ডিলিট করতে হবে";
+                document.getElementById('saveBtn').innerHTML = "<i class='fas fa-upload'></i> প্রোফাইল সেভ করুন";
                 database.ref('donors/'+myKey).once('value').then(s => {
                     const d = s.val();
                     if(d) {
-                        document.getElementById('inName').value = d.name || "";
-                        document.getElementById('inBlood').value = d.blood || "";
-                        document.getElementById('inType').value = d.type || "";
-                        document.getElementById('inLoc').value = d.loc || "";
-                        document.getElementById('inPhone').value = d.phone || "";
-                        document.getElementById('inWeight').value = d.weight || "";
-                        document.getElementById('inLast').value = d.last || "";
-                        document.getElementById('inTimes').value = d.times || "";
-                        document.getElementById('inCanDonate').value = d.canDonate || "হ্যাঁ";
-                        document.getElementById('inBio').value = d.bio || "";
-                        document.getElementById('inFb').value = d.fb || "";
-                        document.getElementById('inWa').value = d.wa || "";
+                        document.getElementById('inName').value = d.name || ""; document.getElementById('inBlood').value = d.blood || ""; document.getElementById('inType').value = d.type || "";
+                        document.getElementById('inLoc').value = d.loc || ""; document.getElementById('inPhone').value = d.phone || ""; document.getElementById('inWeight').value = d.weight || "";
+                        document.getElementById('inLast').value = d.last || ""; document.getElementById('inTimes').value = d.times || ""; document.getElementById('inCanDonate').value = d.canDonate || "হ্যাঁ";
+                        document.getElementById('inBio').value = d.bio || ""; document.getElementById('inFb').value = d.fb || ""; document.getElementById('inWa').value = d.wa || "";
                     }
-                }).catch(e => console.log(e));
+                });
             } else {
-                document.getElementById('formTitle').innerHTML = "<i class='fas fa-id-card'></i> ডোনার প্রোফাইল সেটআপ";
+                document.getElementById('formTitle').innerHTML = "<i class='fas fa-id-card'></i> নতুন ডোনার অ্যাকাউন্ট";
+                document.getElementById('formSubtitle').innerText = "একটি ফোন থেকে একটি অ্যাকাউন্ট করা যাবে";
                 document.getElementById('saveBtn').innerHTML = "<i class='fas fa-upload'></i> পাবলিশ করুন";
-                document.querySelectorAll('input, textarea').forEach(input => input.value = '');
-                document.getElementById('inCanDonate').value = "হ্যাঁ";
+                document.querySelectorAll('input, textarea').forEach(input => input.value = ''); document.getElementById('inCanDonate').value = "হ্যাঁ";
             }
         }
 
         function showFeed() {
             refreshHeader();
-            document.getElementById('regPage').style.display = 'none';
-            document.getElementById('statsArea').style.display = 'grid'; 
-            document.getElementById('filterTabs').style.display = 'flex';
-            document.getElementById('donorList').style.display = 'block';
-            document.getElementById('navHome').classList.add('active');
-            document.getElementById('navReg').classList.remove('active');
+            document.getElementById('regPage').style.display = 'none'; document.getElementById('statsArea').style.display = 'flex'; 
+            document.getElementById('filterTabs').style.display = 'flex'; document.getElementById('donorList').style.display = 'block';
+            document.getElementById('navHome').classList.add('active'); document.getElementById('navReg').classList.remove('active');
             loadDonors();
         }
 
         function showReg() {
             refreshHeader();
-            document.getElementById('regPage').style.display = 'block';
-            document.getElementById('statsArea').style.display = 'none';
-            document.getElementById('filterTabs').style.display = 'none';
-            document.getElementById('donorList').style.display = 'none';
-            document.getElementById('navReg').classList.add('active');
-            document.getElementById('navHome').classList.remove('active');
+            document.getElementById('regPage').style.display = 'block'; document.getElementById('statsArea').style.display = 'none';
+            document.getElementById('filterTabs').style.display = 'none'; document.getElementById('donorList').style.display = 'none';
+            document.getElementById('navReg').classList.add('active'); document.getElementById('navHome').classList.remove('active');
             updateUI();
         }
 
-        window.onload = () => { 
-            if(myKey) {
-                showFeed(); 
-            } else { 
-                showReg(); 
-            }
-        };
+        window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
 </body>
 </html>
