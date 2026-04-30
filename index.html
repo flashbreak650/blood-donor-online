@@ -120,11 +120,19 @@
     <div id="copyToast">কপি করা হয়েছে</div>
 </head>
 <body oncontextmenu="return false;"> <div id="mainHeader" class="master-app-bar" style="display: none;">
-        <div class="brand-side">
-            <h1>BLOOD web </h1>
-            <span><span class="status-blink"></span> Online</span>
-        </div>
-
+        <div class="brand-side" style="display: flex; align-items: center; gap: 8px;">
+    <!-- ছোট্ট লোগো প্রোফাইল আইকন -->
+    <div style="width: 32px; height: 32px; background: #d90429; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(217, 4, 41, 0.2);">
+        <i class="fas fa-droplet" style="color: white; font-size: 16px;"></i>
+    </div>
+    
+    <div>
+        <h1 style="margin: 0; font-size: 18px; font-weight: 900; color: #2b2d42; line-height: 1.1;">BLOOD WEB</h1>
+        <span style="font-size: 10px; color: #d90429; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+            <span class="status-blink"></span> Online
+        </span>
+    </div>
+</div>
         <div class="user-profile-side" onclick="showReg()">
             <div class="user-text">
                 <h2 id="topNameLabel">লোড হচ্ছে..</h2>
