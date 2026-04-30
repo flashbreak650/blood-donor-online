@@ -105,7 +105,19 @@
     .nav-item.active { color: var(--primary); }
 
     .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
-</style>
+</style>     <div class="action-bar-container" id="topActionArea" style="display: none;">
+        <button class="copy-btn-main" onclick="copyMySite(event)">
+            <i class="fas fa-link"></i> Share
+        </button>
+
+        <div class="search-box-wrapper">
+            <input type="text" id="searchInput" class="search-field" placeholder="নাম বা গ্রুপ খুঁজুন..." onkeyup="loadDonors()">
+            <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
+                <i class="fas fa-search" id="searchIcon"></i>
+            </button>
+        </div>
+    </div>
+    <div id="copyToast">কপি করা হয়েছে</div>
 </head>
 <body oncontextmenu="return false;"> <div id="mainHeader" class="master-app-bar" style="display: none;">
         <div class="brand-side">
@@ -122,21 +134,7 @@
         </div>
     </div>
 
-    <div class="action-bar-container" id="topActionArea" style="display: none;">
-        <button class="copy-btn-main" onclick="copyMySite(event)">
-            <i class="fas fa-link"></i> Share
-        </button>
-
-        <div class="search-box-wrapper">
-            <input type="text" id="searchInput" class="search-field" placeholder="নাম বা গ্রুপ খুঁজুন..." onkeyup="loadDonors()">
-            <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
-                <i class="fas fa-search" id="searchIcon"></i>
-            </button>
-        </div>
-    </div>
-    <div id="copyToast">কপি করা হয়েছে</div>
-
-    <div class="stats-container" id="statsArea" style="display: none;">
+   <div class="stats-container" id="statsArea" style="display: none;">
         <div class="stat-box"><b id="countTotal">0</b><span>মোট ডোনার</span></div>
         <div class="stat-box"><b id="countOnline" style="color: var(--success);">0</b><span>অ্যাক্টিভ</span></div>
         <div class="stat-box"><b id="countOffline" style="color: #dc2626;">0</b><span>অফলাইন</span></div>
@@ -420,4 +418,4 @@
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
 </body>
-</html>
+</html> 
