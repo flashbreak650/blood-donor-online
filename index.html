@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <html lang="bn">
-<head> <style>
-.pwa-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(5px);
-}
-.pwa-card {
-    background: white; padding: 30px; border-radius: 20px;
-    text-align: center; max-width: 320px;
-    transform: scale(0.7); opacity: 0;
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.pwa-card.active { transform: scale(1); opacity: 1; }
-</style>
-<link rel="manifest" href="manifest.json">
+<head> 
 <!-- Open Graph / Facebook Meta Tags -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://blood-donor-online.netlify.app/">
@@ -143,30 +125,6 @@
     </div>
     <div id="copyToast">কপি করা হয়েছে</div>
 </head>
-<div id="pwa-popup" class="pwa-overlay">
-    <div class="pwa-card">
-        <div style="font-size: 50px;">📲</div>
-        <h2>App ইনস্টল করুন</h2>
-        <p>সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি ডাউনলোড করে রাখুন।</p>
-        <button id="pwa-install" style="background:#2563eb; color:white; border:none; padding:10px 20px; border-radius:10px;">ডাউনলোড করুন</button>
-        <button id="pwa-close" style="background:none; border:none; color:#666; display:block; width:100%; margin-top:10px;">পরে করবো</button>
-    </div>
-</div>
-<script>
-window.addEventListener('load', () => {
-    const popup = document.getElementById('pwa-popup');
-    const card = document.querySelector('.pwa-card');
-    setTimeout(() => {
-        popup.style.display = 'flex';
-        setTimeout(() => card.classList.add('active'), 50);
-    }, 1000);
-});
-
-document.getElementById('pwa-close').onclick = () => {
-    document.querySelector('.pwa-card').classList.remove('active');
-    setTimeout(() => { document.getElementById('pwa-popup').style.display = 'none'; }, 400);
-};
-</script>
 <body oncontextmenu="return false;"> <div id="mainHeader" class="master-app-bar" style="display: none;">
         <div class="brand-side" style="display: flex; align-items: center; gap: 8px;">
     <!-- ছোট্ট লোগো প্রোফাইল আইকন -->
@@ -476,153 +434,55 @@ document.getElementById('pwa-close').onclick = () => {
 
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
-    <!-- JavaScript শুরু -->
-<script>
-    // ১. সার্ভিস ওয়ার্কার রেজিস্টার করা (এটি ২ নম্বর ধাপের জন্য জরুরি)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("Service Worker Registered"))
-        .catch((err) => console.log("Service Worker Failed", err));
-    }
-
-    let deferredPrompt;
-    const pwaPopup = document.getElementById('pwa-popup');
-    const pwaCard = document.querySelector('.pwa-card');
-    const btnInstall = document.getElementById('pwa-install');
-    const btnClose = document.getElementById('pwa-close');
-
-    // ২. ব্রাউজার যখন ইনস্টল করার জন্য রেডি হবে
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        // ১ সেকেন্ড পর এনিমেশন সহ পপ-আপ দেখাবে
-        setTimeout(() => {
-            if(pwaPopup) {
-                pwaPopup.style.display = 'flex';
-                setTimeout(() => pwaCard.classList.add('active'), 50);
-            }
-        }, 1000); 
-    });
-
-    // ৩. ডাউনলোড বাটনে ক্লিক করলে যা হবে
-    btnInstall.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-            pwaPopup.style.display = 'none';
-        } else {
-            // যদি ব্রাউজার রেডি না থাকে তবে ম্যানুয়াল নিয়ম দেখাবে
-            alert("ইনস্টল করতে ব্রাউজারের মেনু থেকে 'Install app' বা 'Add to Home screen' এ ক্লিক করুন।");
-        }
-    });
-
-    // ৪. পরে করবো বা ক্লোজ বাটন
-    btnClose.addEventListener('click', () => {
-        pwaCard.classList.remove('active');
-        setTimeout(() => pwaPopup.style.display = 'none', 400);
-    });
-</script>
-<!-- JavaScript শেষ -->
-</body> <!-- পপ-আপ নোটিশ -->
-<div id="pwa-popup" class="pwa-overlay">
-    <div class="pwa-card">
-        <div class="pwa-icon">📲</div>
-        <h2>App ইনস্টল করুন</h2>
-        <p>সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
-        <div class="pwa-buttons">
-            <button id="pwa-install" class="btn-download">ডাউনলোড করুন</button>
-            <button id="pwa-close" class="btn-close">পরে করবো</button>
-        </div>
+    <!-- পপ-আপ ডিজাইন -->
+<div id="pwa-popup" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(5px);">
+    <div style="background:white; padding:30px; border-radius:20px; text-align:center; max-width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <div style="font-size: 50px; margin-bottom: 10px;">📲</div>
+        <h2 style="margin:0; font-family:sans-serif;">App ইনস্টল করুন</h2>
+        <p style="color:#555; font-family:sans-serif;">সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
+        <button id="pwa-install" style="background:#2563eb; color:white; border:none; padding:12px 25px; border-radius:10px; font-weight:bold; cursor:pointer; width:100%;">ডাউনলোড করুন</button>
+        <button id="pwa-close" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">পরে করবো</button>
     </div>
 </div>
 
-<style>
-/* এনিমেশন এবং ডিজাইন */
-.pwa-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: none; /* শুরুতে লুকানো থাকবে */
-    align-items: center; justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(5px);
-}
-
-.pwa-card {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    max-width: 320px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transform: scale(0.7);
-    opacity: 0;
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.pwa-card.active {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.pwa-icon { font-size: 50px; margin-bottom: 10px; }
-
-.btn-download {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn-close {
-    background: transparent;
-    border: none;
-    color: #666;
-    margin-top: 10px;
-    cursor: pointer;
-    display: block;
-    width: 100%;
-}
 <script>
 let deferredPrompt;
-const pwaPopup = document.getElementById('pwa-popup');
-const pwaCard = document.querySelector('.pwa-card');
-const btnInstall = document.getElementById('pwa-install');
-const btnClose = document.getElementById('pwa-close');
 
+// সার্ভিস ওয়ার্কার রেজিস্টার করা
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("System Ready"))
+    .catch((err) => console.log("System Error", err));
+}
+
+// ব্রাউজারের ডাউনলোড প্রম্পট ধরা
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     
-    // সাইটে ঢোকার ২ সেকেন্ড পর পপ-আপ দেখাবে
+    // ২ সেকেন্ড পর পপ-আপ দেখাবে
     setTimeout(() => {
-        pwaPopup.style.display = 'flex';
-        setTimeout(() => pwaCard.classList.add('active'), 10);
-    }, 2000); 
+        document.getElementById('pwa-popup').style.display = 'flex';
+    }, 2000);
 });
 
-btnInstall.addEventListener('click', async () => {
+// ডাউনলোড বাটনে ক্লিক করলে যা হবে
+document.getElementById('pwa-install').addEventListener('click', async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         deferredPrompt = null;
-        hidePopup();
+        document.getElementById('pwa-popup').style.display = 'none';
+    } else {
+        // যদি বাটন সরাসরি কাজ না করে তবে বিকল্প নিয়ম
+        alert("ইন্সটল করতে ব্রাউজারের ওপরের (⋮) মেনু থেকে 'Install App' ক্লিক করুন।");
     }
 });
 
-btnClose.addEventListener('click', hidePopup);
-
-function hidePopup() {
-    pwaCard.classList.remove('active');
-    setTimeout(() => pwaPopup.style.display = 'none', 400);
-}
+// ক্লোজ বাটন
+document.getElementById('pwa-close').onclick = () => {
+    document.getElementById('pwa-popup').style.display = 'none';
+};
 </script>
-
-
-</style>
+</body>
 </html> 
