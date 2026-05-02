@@ -1,20 +1,72 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head> 
-<!-- Open Graph / Facebook Meta Tags -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://blood-donor-online.netlify.app/">
-<meta property="og:title" content="Blood Donor Online - জরুরি রক্ত দাতা খুঁজুন">
-<meta property="og:description" content="জরুরি প্রয়োজনে আপনার এলাকায় রক্তের ডোনার খুঁজে পেতে আমাদের এই ওয়েবসাইটটি ব্যবহার করুন।">
-<meta property="og:image" content="https://i.postimg.cc/FKC5414G/10784622.png">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7071939918593154" crossorigin="anonymous"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Blood Donor Online</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://blood-donor-online.netlify.app/">
+    <meta property="og:title" content="Blood Donor Online - জরুরি রক্ত দাতা খুঁজুন">
+    <meta property="og:description" content="জরুরি প্রয়োজনে আপনার এলাকায় রক্তের ডোনার খুঁজে পেতে আমাদের এই ওয়েবসাইটটি ব্যবহার করুন।">
+    <meta property="og:image" content="https://i.postimg.cc/FKC5414G/10784622.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<style>
+
+    <style>
+        /* অ্যান্টি-কপি স্টাইল */
+        body {
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+        }
+        
+        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; }
+        body { background-color: var(--bg-color); font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; padding-bottom: 90px; margin: 0; overflow-x: hidden; }
+
+        /* ব্যানার অ্যাড কন্টেইনার ডিজাইন */
+        .ad-banner-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 10px auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+
+    max-width: 450px;
+    margin: 10px auto;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.ad-label {
+    display: block;
+    font-size: 8px;
+    color: #999;
+    padding: 2px 0;
+    letter-spacing: 1px;
+}
+
+.ad-placeholder img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
     /* অ্যান্টি-কপি স্টাইল (টেক্সট সিলেক্ট করা যাবে না) */
     body {
         -webkit-user-select: none; 
@@ -111,7 +163,45 @@
     .nav-item.active { color: var(--primary); }
 
     .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
-</style>     <div class="action-bar-container" id="topActionArea" style="display: none;">
+
+    /* Success Animation CSS */
+    .success-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: none; align-items: center;
+        justify-content: center; z-index: 10001; backdrop-filter: blur(3px);
+    }
+    .success-box {
+        background: white; padding: 30px; border-radius: 15px;
+        text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        transform: scale(0.8); opacity: 0; transition: all 0.3s ease;
+    }
+    .success-box.show { transform: scale(1); opacity: 1; }
+    .success-icon {
+        font-size: 50px; color: var(--success); margin-bottom: 15px;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+        0% { transform: scale(0); }
+        80% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    .success-btn {
+        background: var(--primary); color: white; border: none;
+        padding: 10px 25px; border-radius: 20px; margin-top: 15px; cursor: pointer;
+    }
+</style>     
+</head>
+<div class="ad-banner-container">
+    <span class="ad-label">ADVERTISEMENT</span>
+    <div class="ad-placeholder">
+        <a href="#" target="_blank">
+            <img src="https://via.placeholder.com/400x80?text=Donate+Blood+Save+Life" alt="Ad">
+        </a>
+    </div>
+</div>
+
+<body oncontextmenu="return false;"> 
+    <div class="action-bar-container" id="topActionArea" style="display: none;">
         <button class="copy-btn-main" onclick="copyMySite(event)">
             <i class="fas fa-link"></i> Share
         </button>
@@ -124,21 +214,19 @@
         </div>
     </div>
     <div id="copyToast">কপি করা হয়েছে</div>
-</head>
-<body oncontextmenu="return false;"> <div id="mainHeader" class="master-app-bar" style="display: none;">
+
+    <div id="mainHeader" class="master-app-bar" style="display: none;">
         <div class="brand-side" style="display: flex; align-items: center; gap: 8px;">
-    <!-- ছোট্ট লোগো প্রোফাইল আইকন -->
-    <div style="width: 32px; height: 32px; background: #d90429; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(217, 4, 41, 0.2);">
-        <i class="fas fa-droplet" style="color: white; font-size: 16px;"></i>
-    </div>
-    
-    <div>
-        <h1 style="margin: 0; font-size: 18px; font-weight: 900; color: #2b2d42; line-height: 1.1;">BLOOD WEB</h1>
-        <span style="font-size: 10px; color: #d90429; font-weight: bold; display: flex; align-items: center; gap: 4px;">
-            <span class="status-blink"></span> Online
-        </span>
-    </div>
-</div>
+            <div style="width: 32px; height: 32px; background: #d90429; border-radius: 8px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(217, 4, 41, 0.2);">
+                <i class="fas fa-droplet" style="color: white; font-size: 16px;"></i>
+            </div>
+            <div>
+                <h1 style="margin: 0; font-size: 18px; font-weight: 900; color: #2b2d42; line-height: 1.1;">BLOOD WEB</h1>
+                <span style="font-size: 10px; color: #d90429; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                    <span class="status-blink"></span> Online
+                </span>
+            </div>
+        </div>
         <div class="user-profile-side" onclick="showReg()">
             <div class="user-text">
                 <h2 id="topNameLabel">লোড হচ্ছে..</h2>
@@ -198,6 +286,25 @@
         <button type="button" id="navReg" class="nav-item active" onclick="showReg()"><i class="fas fa-user-edit"></i></button>
     </div>
 
+    <div class="success-overlay" id="successPopup">
+        <div class="success-box" id="successBox">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h3 style="margin: 0; color: #333;">সফল হয়েছে!</h3>
+            <p style="color: var(--gray); font-size: 14px;">আপনার প্রোফাইল আপডেট সম্পন্ন হয়েছে।</p>
+            <button class="success-btn" onclick="closeSuccess()">ওকে</button>
+        </div>
+    </div>
+
+    <div id="pwa-popup" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(5px);">
+        <div style="background:white; padding:30px; border-radius:20px; text-align:center; max-width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+            <div style="font-size: 50px; margin-bottom: 10px;">📲</div>
+            <h2 style="margin:0; font-family:sans-serif;">App ইনস্টল করুন</h2>
+            <p style="color:#555; font-family:sans-serif;">সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
+            <button id="pwa-install" style="background:#2563eb; color:white; border:none; padding:12px 25px; border-radius:10px; font-weight:bold; cursor:pointer; width:100%;">ডাউনলোড করুন</button>
+            <button id="pwa-close" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">পরে করবো</button>
+        </div>
+    </div>
+
     <script>
         // অ্যান্টি-কপি: কীবোর্ড শর্টকাট বন্ধ করা হলো
         document.addEventListener('keydown', function(e) {
@@ -231,27 +338,27 @@
             if (input.classList.contains('active')) { input.focus(); icon.classList.replace('fa-search', 'fa-times'); } else { input.value = ""; icon.classList.replace('fa-times', 'fa-search'); loadDonors(); }
         }
 
-      function refreshHeader() {
-    // এই দুটি লাইন সবসময় 'flex' থাকবে, অ্যাকাউন্ট থাকুক বা না থাকুক
-    document.getElementById('mainHeader').style.display = 'flex';
-    document.getElementById('topActionArea').style.display = 'flex';
+        function refreshHeader() {
+            // এই দুটি লাইন সবসময় 'flex' থাকবে, অ্যাকাউন্ট থাকুক বা না থাকুক
+            document.getElementById('mainHeader').style.display = 'flex';
+            document.getElementById('topActionArea').style.display = 'flex';
 
-    if (myKey) {
-        database.ref('donors/' + myKey).once('value').then(snap => {
-            const data = snap.val();
-            if (data) {
-                document.getElementById('topNameLabel').innerText = data.name;
-                document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
+            if (myKey) {
+                database.ref('donors/' + myKey).once('value').then(snap => {
+                    const data = snap.val();
+                    if (data) {
+                        document.getElementById('topNameLabel').innerText = data.name;
+                        document.getElementById('topAvatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}`;
+                    } else {
+                        localStorage.removeItem('myDonorKey'); myKey = null; location.reload();
+                    }
+                }).catch(err => console.log(err));
             } else {
-                localStorage.removeItem('myDonorKey'); myKey = null; location.reload();
+                // অ্যাকাউন্ট না থাকলে ডিফল্ট লেখা দেখাবে
+                document.getElementById('topNameLabel').innerText = "Registration";
+                document.getElementById('topAvatarImg').src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
             }
-        }).catch(err => console.log(err));
-    } else {
-        // অ্যাকাউন্ট না থাকলে ডিফল্ট লেখা দেখাবে
-        document.getElementById('topNameLabel').innerText = "Registration";
-        document.getElementById('topAvatarImg').src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-    }
-}
+        }
 
         window.addEventListener('load', refreshHeader);
 
@@ -272,13 +379,29 @@
             ref.set(data).then(() => {
                 localStorage.setItem('myDonorKey', ref.key); myKey = ref.key;
                 btn.innerHTML = originalText; btn.disabled = false;
-                alert("আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে!"); 
+                
+                showSuccess(); // Success Animation Call
+                
                 refreshHeader(); 
                 setFilter('all', document.querySelector('.filter-btn')); // অ্যাকাউন্ট করলে সব পোস্টে চলে যাবে
                 showFeed(); 
             }).catch((error) => {
                 btn.innerHTML = originalText; btn.disabled = false; alert("আপডেট ব্যর্থ হয়েছে!");
             });
+        }
+
+        function showSuccess() {
+            const overlay = document.getElementById('successPopup');
+            const box = document.getElementById('successBox');
+            overlay.style.display = 'flex';
+            setTimeout(() => box.classList.add('show'), 10);
+        }
+
+        function closeSuccess() {
+            const overlay = document.getElementById('successPopup');
+            const box = document.getElementById('successBox');
+            box.classList.remove('show');
+            setTimeout(() => overlay.style.display = 'none', 300);
         }
 
         function loadDonors() {
@@ -326,7 +449,7 @@
                                 <div class="profile-part">
                                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${data.phone}" class="avatar">
                                     <div class="name-area">
-                                        <h3>${data.name} <i class="fas fa-check-circle" style="color:#1da1f2;"></i></h3>
+                                        <h3>${data.name} <i class="fas fa-check-circle" style="color:#39FF14;"></i></h3>
                                         <div style="font-size: 11px; color: var(--gray);"><i class="fas fa-map-marker-alt"></i> ${data.loc}</div>
                                         <div class="social-row">
                                             <a href="${data.fb || '#'}" target="_blank"><i class="fab fa-facebook"></i></a>
@@ -348,7 +471,7 @@
                                 <div><b>${data.followers || 0}</b> ফলোয়ার</div>
                                 <div><b>${data.times}</b> রক্ত দান</div>
                                 <div><b>রেটিং ${data.rating || 80}%</b></div>
-                            </div>
+                 </div>
                             <div class="review-section">
                                 <div class="star-box" onclick="giveRating('${key}')">
                                     <i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star"></i>
@@ -433,56 +556,50 @@
         }
 
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
+
+        // PWA Installation Script
+        let deferredPrompt;
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log("Service Worker Registered"))
+                .catch(err => console.log("Service Worker Error:", err));
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Check if app is already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                return; // App is already installed, don't show popup
+            }
+
+            setTimeout(() => {
+                const popup = document.getElementById('pwa-popup');
+                if(popup) popup.style.display = 'flex';
+            }, 2000);
+        });
+
+        document.getElementById('pwa-install').addEventListener('click', async () => {
+            document.getElementById('pwa-popup').style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            } else {
+                alert("ইন্সটল করতে ব্রাউজারের ওপরের (⋮) মেনু থেকে 'Add to Home Screen' বা 'Install App' নির্বাচন করুন।");
+            }
+        });
+
+        document.getElementById('pwa-close').onclick = () => {
+            document.getElementById('pwa-popup').style.display = 'none';
+        };
     </script>
-    <!-- পপ-আপ ডিজাইন -->
-<div id="pwa-popup" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(5px);">
-    <div style="background:white; padding:30px; border-radius:20px; text-align:center; max-width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
-        <div style="font-size: 50px; margin-bottom: 10px;">📲</div>
-        <h2 style="margin:0; font-family:sans-serif;">App ইনস্টল করুন</h2>
-        <p style="color:#555; font-family:sans-serif;">সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
-        <button id="pwa-install" style="background:#2563eb; color:white; border:none; padding:12px 25px; border-radius:10px; font-weight:bold; cursor:pointer; width:100%;">ডাউনলোড করুন</button>
-        <button id="pwa-close" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">পরে করবো</button>
-    </div>
-</div>
-
-<script>
-let deferredPrompt;
-
-// সার্ভিস ওয়ার্কার রেজিস্টার করা
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("System Ready"))
-    .catch((err) => console.log("System Error", err));
-}
-
-// ব্রাউজারের ডাউনলোড প্রম্পট ধরা
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // ২ সেকেন্ড পর পপ-আপ দেখাবে
-    setTimeout(() => {
-        document.getElementById('pwa-popup').style.display = 'flex';
-    }, 2000);
-});
-
-// ডাউনলোড বাটনে ক্লিক করলে যা হবে
-document.getElementById('pwa-install').addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        document.getElementById('pwa-popup').style.display = 'none';
-    } else {
-        // যদি বাটন সরাসরি কাজ না করে তবে বিকল্প নিয়ম
-        alert("ইন্সটল করতে ব্রাউজারের ওপরের (⋮) মেনু থেকে 'Install App' ক্লিক করুন।");
-    }
-});
-
-// ক্লোজ বাটন
-document.getElementById('pwa-close').onclick = () => {
-    document.getElementById('pwa-popup').style.display = 'none';
-};
-</script>
 </body>
 </html> 
