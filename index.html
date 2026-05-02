@@ -6,6 +6,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Blood Donor Online</title>
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://blood-donor-online.netlify.app/">
+    <meta property="og:title" content="Blood Donor Online - জরুরি রক্ত দাতা খুঁজুন">
+    <meta property="og:description" content="জরুরি প্রয়োজনে আপনার এলাকায় রক্তের ডোনার খুঁজে পেতে আমাদের এই ওয়েবসাইটটি ব্যবহার করুন।">
+    <meta property="og:image" content="https://i.postimg.cc/FKC5414G/10784622.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<link rel="manifest" href="manifest.json">
+
+    <style>
+    <!DOCTYPE html>
+<html lang="bn">
+<head> 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7071939918593154" crossorigin="anonymous"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Donor Online</title>
+
+    <link rel="manifest" href="manifest.json">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://blood-donor-online.netlify.app/">
@@ -18,6 +41,27 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
+        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 15px; padding-bottom: 90px; margin: 0; 
+            overflow-x: hidden;
+            -webkit-user-select: none; user-select: none; 
+        }
+
+        /* অ্যাড ব্যানার ডিজাইন */
+        .ad-banner-container {
+            width: 100%; max-width: 450px; margin: 10px auto;
+            background: #fff; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center;
+        }
+        .ad-label { display: block; font-size: 8px; color: #999; padding: 2px 0; letter-spacing: 1px; }
+
+        /* অন্যান্য স্টাইল যা আপনার আগে ছিল সেগুলো এখানে থাকবে... */
+        
         /* অ্যান্টি-কপি স্টাইল */
         body {
             -webkit-user-select: none; 
@@ -557,49 +601,58 @@
 
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
 
+            </script> <script>
         // PWA Installation Script
         let deferredPrompt;
 
+            <script>
+        // ১. সার্ভিস ওয়ার্কার রেজিস্টার (অ্যাপ হিসেবে চালানোর জন্য)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(() => console.log("Service Worker Registered"))
-                .catch(err => console.log("Service Worker Error:", err));
+                .catch(err => console.log("Error:", err));
         }
 
+        let deferredPrompt;
+
+        // ২. ব্রাউজারের ডিফল্ট পপ-আপ ধরা
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             
-            // Check if app is already installed
+            // যদি অ্যাপ অলরেডি ফোনে থাকে তবে দেখাবে না
             if (window.matchMedia('(display-mode: standalone)').matches) {
-                return; // App is already installed, don't show popup
+                return; 
             }
 
+            // সাইটে ঢোকার ৩ সেকেন্ড পর "অ্যাপ ইন্সটল" নোটিশ দেখাবে
             setTimeout(() => {
                 const popup = document.getElementById('pwa-popup');
                 if(popup) popup.style.display = 'flex';
-            }, 2000);
+            }, 3000);
         });
 
+        // ৩. ইন্সটল বাটনে ক্লিক করলে আসল পারমিশন আসবে
         document.getElementById('pwa-install').addEventListener('click', async () => {
-            document.getElementById('pwa-popup').style.display = 'none';
+            const popup = document.getElementById('pwa-popup');
+            if(popup) popup.style.display = 'none';
+
             if (deferredPrompt) {
-                deferredPrompt.prompt();
+                deferredPrompt.prompt(); // ফোনের আসল 'Allow' বা 'Install' সিস্টেম
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                } else {
-                    console.log('User dismissed the install prompt');
-                }
                 deferredPrompt = null;
             } else {
-                alert("ইন্সটল করতে ব্রাউজারের ওপরের (⋮) মেনু থেকে 'Add to Home Screen' বা 'Install App' নির্বাচন করুন।");
+                // পপ-আপ ব্লক থাকলে ম্যানুয়ালি দেখাবে
+                alert("ইন্সটল করতে ব্রাউজারের (⋮) মেনু থেকে 'Install app' এ ক্লিক করুন।");
             }
         });
 
+        // ৪. পপ-আপ বন্ধ করা
         document.getElementById('pwa-close').onclick = () => {
-            document.getElementById('pwa-popup').style.display = 'none';
+            const popup = document.getElementById('pwa-popup');
+            if(popup) popup.style.display = 'none';
         };
     </script>
+
 </body>
-</html> 
+</html>
