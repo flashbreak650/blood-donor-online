@@ -22,17 +22,13 @@
     <style>
         /* অ্যান্টি-কপি স্টাইল */
         body {
-            -webkit-user-select: none; 
-            -moz-user-select: none; 
-            -ms-user-select: none; 
-            user-select: none; 
-            background-color: #f0f2f5; 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; 
+            background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
             padding: 15px; padding-bottom: 90px; margin: 0; overflow-x: hidden;
         }
         
-        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; }
+        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; --navy: #2b2d42; }
 
         /* ব্যানার অ্যাড কন্টেইনার ডিজাইন */
         .ad-banner-container {
@@ -53,7 +49,7 @@
         .user-img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #d90429; background: #fff; }
         @keyframes blinker { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* স্ট্যাটাস বক্সগুলোকে ফিল্টার বাটনের মতো ছোট করার কোড */
+        /* স্ট্যাটাস বক্স */
         .stats-container { display: flex !important; justify-content: center !important; gap: 6px !important; width: 100% !important; max-width: 450px !important; margin: 0 auto 12px auto !important; padding: 0 5px !important; }
         .stat-box { flex: 1 !important; background: white !important; padding: 8px 4px !important; border-radius: 20px !important; text-align: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; border: none !important; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; gap: 4px !important; }
         .stat-box b { font-size: 11px !important; color: var(--primary) !important; line-height: 1 !important; }
@@ -63,12 +59,26 @@
         #copyToast.show { visibility: visible; animation: fadeHB 2.5s; }
         @keyframes fadeHB { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
 
-        .action-bar-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin: 15px 0; width: 100%; max-width: 450px; }
-        .copy-btn-main { background: #d90429; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); display: flex; align-items: center; gap: 8px; }
-        .search-box-wrapper { display: flex; align-items: center; position: relative; }
-        .search-field { width: 0; opacity: 0; height: 40px; border: none; border-radius: 25px; outline: none; transition: all 0.4s ease; background: #fff; font-size: 14px; }
-        .search-field.active { width: 200px; opacity: 1; padding: 0 15px; margin-right: -45px; border: 2px solid #d90429; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .search-circle-btn { width: 48px; height: 48px; background: #fff; color: #d90429; border: 2px solid #eee; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 2; transition: 0.3s; }
+        /* --- অ্যাকশন বার, বাটন ও সার্চ এনিমেশন --- */
+        .action-bar-container { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 15px 0; width: 100%; max-width: 450px; position: relative; }
+        
+        /* বাটন গ্রুপ স্লাইডিং এনিমেশন */
+        .action-buttons { display: flex; gap: 8px; transition: all 0.4s ease; overflow: hidden; width: 100%; opacity: 1; white-space: nowrap; }
+        .action-buttons.hide { width: 0; opacity: 0; transform: translateX(-20px); pointer-events: none; gap: 0; margin: 0; }
+        
+        .copy-btn-main { background: #d90429; color: white; border: none; padding: 10px 15px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); display: flex; align-items: center; gap: 8px; }
+        
+        /* নতুন ডাউনলোড বাটন এনিমেশন */
+        .btn-download-anim { background: var(--navy); color: white; border: none; padding: 10px 18px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; animation: pulse-dark 2s infinite; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        @keyframes pulse-dark { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(43, 45, 66, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(43, 45, 66, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(43, 45, 66, 0); } }
+
+        /* সার্চ বক্স এনিমেশন */
+        .search-box-wrapper { display: flex; align-items: center; position: relative; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); justify-content: flex-end; flex-grow: 0; }
+        .search-box-wrapper.expand { flex-grow: 1; width: 100%; }
+        
+        .search-field { width: 0; opacity: 0; height: 44px; border: none; border-radius: 25px; outline: none; transition: all 0.4s ease; background: #fff; font-size: 14px; padding: 0; }
+        .search-field.active { width: 100%; opacity: 1; padding: 0 15px 0 15px; border: 2px solid #d90429; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-right: -45px; z-index: 1; box-sizing: border-box; }
+        .search-circle-btn { width: 44px; height: 44px; background: #fff; color: #d90429; border: 2px solid #eee; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 2; transition: 0.3s; flex-shrink: 0; }
         .search-circle-btn.active { background: #d90429; color: #fff; border-color: #d90429; }
 
         .filter-container { display: flex; gap: 5px; width: 100%; max-width: 450px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
@@ -127,13 +137,29 @@
 
         .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
 
-        /* Success Animation CSS */
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10001; backdrop-filter: blur(3px); }
         .success-box { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.8); opacity: 0; transition: all 0.3s ease; }
         .success-box.show { transform: scale(1); opacity: 1; }
         .success-icon { font-size: 50px; color: var(--success); margin-bottom: 15px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
         .success-btn { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 20px; margin-top: 15px; cursor: pointer; }
+
+        /* --- কাস্টম পপ-আপ (Bottom Sheet) এনিমেশন --- */
+        #auto-pwa-popup {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: white; border-top-left-radius: 30px; border-top-right-radius: 30px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 10002;
+            transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            padding: 30px 20px; box-sizing: border-box; text-align: center;
+            display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(5px);
+        }
+        #auto-pwa-popup.show { bottom: 0; }
+        .pwa-icon-anim { font-size: 60px; color: #d90429; margin-bottom: 15px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-15px);} 60% {transform: translateY(-7px);} }
+        .pwa-btn-group { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-top: 20px; }
+        .pwa-btn { flex: 1; padding: 12px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .pwa-install-btn { background: #d90429; color: white; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.3); }
+        .pwa-close-btn { background: #eee; color: #333; }
     </style>     
 </head>
 
@@ -143,18 +169,24 @@
         <span class="ad-label">ADVERTISEMENT</span>
         <div class="ad-placeholder">
             <a href="#" target="_blank">
-                <img src="https://via.placeholder.com/400x80?text=Donate+Blood+Save+Life" alt="Ad">
+                <img src="https://via.placeholder.com/400x80?text=Donate+Blood+Save+Life" alt="Ad" style="width: 100%;">
             </a>
         </div>
     </div>
 
     <div class="action-bar-container" id="topActionArea" style="display: none;">
-        <button class="copy-btn-main" onclick="copyMySite(event)">
-            <i class="fas fa-link"></i> Share
-        </button>
+        
+        <div id="actionButtons" class="action-buttons">
+            <button class="copy-btn-main" onclick="copyMySite(event)">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="btn-download-anim" onclick="openPwaPopup()">
+                <i class="fas fa-download"></i> App
+            </button>
+        </div>
 
-        <div class="search-box-wrapper">
-            <input type="text" id="searchInput" class="search-field" placeholder="নাম বা গ্রুপ খুঁজুন..." onkeyup="loadDonors()">
+        <div class="search-box-wrapper" id="searchWrapper">
+            <input type="text" id="searchInput" class="search-field" placeholder="খুঁজুন..." onkeyup="loadDonors()">
             <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
                 <i class="fas fa-search" id="searchIcon"></i>
             </button>
@@ -243,27 +275,24 @@
         </div>
     </div>
 
-    <div id="pwa-popup" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(5px);">
-        <div style="background:white; padding:30px; border-radius:20px; text-align:center; max-width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
-            <div style="font-size: 50px; margin-bottom: 10px;">📲</div>
-            <h2 style="margin:0; font-family:sans-serif;">App ইনস্টল করুন</h2>
-            <p style="color:#555; font-family:sans-serif;">সেরা অভিজ্ঞতার জন্য আমাদের সাইটটি আপনার হোম স্ক্রিনে ডাউনলোড করে রাখুন।</p>
-            <button id="pwa-install" style="background:#2563eb; color:white; border:none; padding:12px 25px; border-radius:10px; font-weight:bold; cursor:pointer; width:100%;">ডাউনলোড করুন</button>
-            <button id="pwa-close" style="background:none; border:none; color:#888; margin-top:15px; cursor:pointer;">পরে করবো</button>
+    <div id="auto-pwa-popup">
+        <div class="pwa-icon-anim"><i class="fas fa-cloud-download-alt"></i></div>
+        <h2 style="margin:0; color:#2b2d42; font-size: 22px;">সরাসরি অ্যাপ সেভ করুন</h2>
+        <p style="color:#666; font-size:14px; margin-top: 10px;">জরুরি মুহূর্তে দ্রুত রক্তদাতা খুঁজে পেতে হোম স্ক্রিনে শর্টকাট তৈরি করে রাখুন।</p>
+        <div class="pwa-btn-group">
+            <button class="pwa-btn pwa-close-btn" onclick="closePwaPopup()">পরে</button>
+            <button class="pwa-btn pwa-install-btn" id="pwa-install-btn">ইন্সটল করুন</button>
         </div>
     </div>
 
     <script>
-        // অ্যান্টি-কপি: কীবোর্ড শর্টকাট বন্ধ করা হলো
         document.addEventListener('keydown', function(e) {
             if(e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
             if(e.key === 'F12') { e.preventDefault(); return false; }
         });
 
- // ফায়ারবেস কনফিগারেশন লুকানো (Base64 Encode)
         const _0xdbKey = "eyJhcGlLZXkiOiJBSXphU3lCcldlc3FfdDVmdVVQY0Nmd0tEZHBJakJhSHVtaFFnLWciLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYmxvb2QtZG9ub3Itb25saW5lLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbSIsInByb2plY3RJZCI6ImJsb29kLWRvbm9yLW9ubGluZSJ9";
         const firebaseConfig = JSON.parse(atob(_0xdbKey));
-        
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
@@ -272,18 +301,35 @@
         let favList = JSON.parse(localStorage.getItem('myFavDonors')) || [];
 
         function copyMySite(e) {
-            const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://blood-donor-online.netlify.app/";
-            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(infoText).then(() => { showHBToast(); }).catch(err => { fallbackCopy(infoText); }); } else { fallbackCopy(infoText); }
+            const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://flashbreak650.github.io/blood-donor-online/";
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(infoText).then(() => { showHBToast("লিঙ্ক কপি করা হয়েছে"); }).catch(err => { fallbackCopy(infoText); }); } else { fallbackCopy(infoText); }
             const btn = e.currentTarget; const circle = document.createElement("span"); circle.style.width = circle.style.height = "50px"; circle.style.position = "absolute"; circle.style.background = "rgba(255,255,255,0.3)"; circle.style.borderRadius = "50%"; circle.style.left = "50%"; circle.style.top = "50%"; circle.style.transform = "translate(-50%, -50%) scale(0)"; circle.style.animation = "rippleHB 0.4s linear"; btn.appendChild(circle); setTimeout(() => circle.remove(), 400);
         }
 
-        function fallbackCopy(text) { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select(); try { document.execCommand('copy'); showHBToast(); } catch (err) { alert("কপি করা সম্ভব হচ্ছে না"); } document.body.removeChild(textArea); }
-        function showHBToast() { const toast = document.getElementById("copyToast"); toast.className = "show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500); }
+        function fallbackCopy(text) { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select(); try { document.execCommand('copy'); showHBToast("লিঙ্ক কপি করা হয়েছে"); } catch (err) { alert("কপি করা সম্ভব হচ্ছে না"); } document.body.removeChild(textArea); }
+        function showHBToast(msg) { const toast = document.getElementById("copyToast"); toast.innerText = msg; toast.className = "show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500); }
 
+        // --- স্মুথ সার্চ বক্স এনিমেশন ---
         function toggleSearch() {
-            const input = document.getElementById('searchInput'); const btn = document.getElementById('searchBtn'); const icon = document.getElementById('searchIcon');
-            input.classList.toggle('active'); btn.classList.toggle('active');
-            if (input.classList.contains('active')) { input.focus(); icon.classList.replace('fa-search', 'fa-times'); } else { input.value = ""; icon.classList.replace('fa-times', 'fa-search'); loadDonors(); }
+            const input = document.getElementById('searchInput'); 
+            const btn = document.getElementById('searchBtn'); 
+            const icon = document.getElementById('searchIcon');
+            const actionBtns = document.getElementById('actionButtons');
+            const searchWrap = document.getElementById('searchWrapper');
+            
+            input.classList.toggle('active'); 
+            btn.classList.toggle('active');
+            actionBtns.classList.toggle('hide'); // শেয়ার ও ডাউনলোড বাটন লুকাবে
+            searchWrap.classList.toggle('expand'); // সার্চ বক্স বড় হবে
+            
+            if (input.classList.contains('active')) { 
+                input.focus(); 
+                icon.classList.replace('fa-search', 'fa-times'); 
+            } else { 
+                input.value = ""; 
+                icon.classList.replace('fa-times', 'fa-search'); 
+                loadDonors(); 
+            }
         }
 
         function refreshHeader() {
@@ -415,7 +461,7 @@
                                 <div><b>${data.followers || 0}</b> ফলোয়ার</div>
                                 <div><b>${data.times}</b> রক্ত দান</div>
                                 <div><b>রেটিং ${data.rating || 80}%</b></div>
-                 </div>
+                 </div> 
                             <div class="review-section">
                                 <div class="star-box" onclick="giveRating('${key}')">
                                     <i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star active"></i><i class="fas fa-star"></i>
@@ -481,7 +527,7 @@
                 document.querySelectorAll('input, textarea').forEach(input => input.value = ''); document.getElementById('inCanDonate').value = "হ্যাঁ";
             }
         }
-
+        
         function showFeed() {
             refreshHeader();
             document.getElementById('regPage').style.display = 'none'; document.getElementById('statsArea').style.display = 'flex'; 
@@ -501,53 +547,36 @@
         window.onload = () => { if(myKey) { showFeed(); } else { showReg(); } };
     </script>
 
-    <script>
-        let deferredPrompt;
+<script>
+    let deferredPrompt;
 
-        // ১. সার্ভিস ওয়ার্কার রেজিস্টার 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log("Service Worker Registered"))
-                .catch(err => console.log("SW Error:", err));
+    // ১. ব্রাউজার যখন ইন্সটল করার জন্য রেডি হবে
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // আপনার কাস্টম পপ-আপটি দেখাবে
+        document.getElementById('auto-pwa-popup').classList.add('show');
+    });
+
+    // ২. "ইন্সটল করুন" বাটনে ক্লিক করলে যা হবে
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            // ব্রাউজারের আসল ইন্সটল নোটিশ দেখাবে
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            deferredPrompt = null;
+            document.getElementById('auto-pwa-popup').classList.remove('show');
+        } else {
+            // যদি ব্রাউজার রেডি না থাকে
+            alert("অনুগ্রহ করে ব্রাউজারের উপরের ৩টি ডট (⋮) থেকে 'Install app' বা 'Add to Home screen' এ ক্লিক করুন।");
         }
+    });
 
-        // ২. পপ-আপ কন্ট্রোল (ফোনে থাকলে আসবে না, না থাকলে আসবে)
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); 
-            deferredPrompt = e;
-            
-            // চেক: অ্যাপ যদি অলরেডি ইনস্টল থাকে, তবে পপ-আপ দেখাবে না
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                return; 
-            }
-
-            // ৩ সেকেন্ড পর পপ-আপ এনিমেশন আসবে
-            setTimeout(() => {
-                const popup = document.getElementById('pwa-popup');
-                if(popup) popup.style.display = 'flex';
-            }, 3000);
-        });
-
-        // ৩. ইনস্টল বাটন কাজ
-        document.getElementById('pwa-install').addEventListener('click', async () => {
-            const popup = document.getElementById('pwa-popup');
-            if(popup) popup.style.display = 'none';
-
-            if (deferredPrompt) {
-                deferredPrompt.prompt(); 
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-            } else {
-                alert("ব্রাউজারের ওপরের (⋮) মেনু থেকে 'Add to Home Screen' এ ক্লিক করে ইনস্টল করুন।");
-            }
-        });
-
-        // ৪. ক্লোজ বাটন
-        document.getElementById('pwa-close').addEventListener('click', () => {
-            const popup = document.getElementById('pwa-popup');
-            if(popup) popup.style.display = 'none';
-        });
-    </script>
+    window.addEventListener('appinstalled', () => {
+        alert("অ্যাপটি সফলভাবে আপনার হোম স্ক্রিনে যুক্ত হয়েছে!");
+    });
+</script>
 
 </body>
 </html>
