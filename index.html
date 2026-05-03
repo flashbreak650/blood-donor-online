@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head> 
-    <!-- Google AdSense Script -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7071939918593154" crossorigin="anonymous"></script>
 
     <meta charset="UTF-8">
@@ -23,23 +22,27 @@
     <style>
         /* অ্যান্টি-কপি স্টাইল */
         body {
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; 
-            background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            background-color: #f0f2f5; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
             padding: 15px; padding-bottom: 90px; margin: 0; overflow-x: hidden;
         }
         
-        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; --navy: #2b2d42; }
+        :root { --primary: #d90429; --success: #2b9348; --gray: #6c757d; --bg-color: #f0f2f5; --star: #ffb703; }
 
         /* ব্যানার অ্যাড কন্টেইনার ডিজাইন */
         .ad-banner-container {
-            width: 100%; max-width: 450px; margin: 10px auto 20px auto;
+            width: 100%; max-width: 450px; margin: 10px auto;
             background: #fff; border-radius: 12px; overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee;
         }
         .ad-label { display: block; font-size: 8px; color: #999; padding: 2px 0; letter-spacing: 1px; }
 
-        /* হেডার ডিজাইন */
+        /* প্রিমিয়াম মাস্টার হেডার ডিজাইন */
         .master-app-bar { width: 100%; max-width: 450px; background: #ffffff; border-radius: 20px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
         .brand-side h1 { margin: 0; font-size: 19px; font-weight: 900; color: #2b2d42; letter-spacing: 0.5px; text-transform: uppercase; }
         .brand-side span { font-size: 10px; color: #d90429; font-weight: bold; display: flex; align-items: center; gap: 4px; }
@@ -50,40 +53,28 @@
         .user-img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #d90429; background: #fff; }
         @keyframes blinker { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* স্ট্যাটাস বক্স */
-        .stats-container { display: flex; justify-content: center; gap: 6px; width: 100%; max-width: 450px; margin: 0 auto 12px auto; }
-        .stat-box { flex: 1; background: white; padding: 8px 4px; border-radius: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: none; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 4px; }
-        .stat-box b { font-size: 11px; color: var(--primary); line-height: 1; }
-        .stat-box span { font-size: 11px; color: var(--gray); font-weight: bold; }
+        /* স্ট্যাটাস বক্সগুলোকে ফিল্টার বাটনের মতো ছোট করার কোড */
+        .stats-container { display: flex !important; justify-content: center !important; gap: 6px !important; width: 100% !important; max-width: 450px !important; margin: 0 auto 12px auto !important; padding: 0 5px !important; }
+        .stat-box { flex: 1 !important; background: white !important; padding: 8px 4px !important; border-radius: 20px !important; text-align: center !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; border: none !important; display: flex !important; flex-direction: row !important; justify-content: center !important; align-items: center !important; gap: 4px !important; }
+        .stat-box b { font-size: 11px !important; color: var(--primary) !important; line-height: 1 !important; }
+        .stat-box span { font-size: 11px !important; color: var(--gray) !important; font-weight: bold !important; }
         
         #copyToast { visibility: hidden; background: #333; color: #fff; text-align: center; padding: 8px 15px; position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); border-radius: 20px; font-size: 12px; z-index: 10000; }
         #copyToast.show { visibility: visible; animation: fadeHB 2.5s; }
         @keyframes fadeHB { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
 
-        /* অ্যাকশন বার এবং সার্চ অ্যানিমেশন */
-        .action-bar-container { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 450px; margin: 15px 0; }
-        
-        .action-buttons { display: flex; gap: 8px; transition: all 0.4s ease; overflow: hidden; width: 100%; opacity: 1; }
-        .action-buttons.hide { width: 0; opacity: 0; margin: 0; padding: 0; gap: 0; }
-        
-        .copy-btn-main { background: var(--primary); color: white; border: none; padding: 10px 16px; border-radius: 25px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        .download-btn-main { background: var(--navy); color: white; border: none; padding: 10px 16px; border-radius: 25px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(43, 45, 66, 0.2); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        
-        .search-box-wrapper { display: flex; align-items: center; position: relative; transition: all 0.4s ease; flex-grow: 0; justify-content: flex-end; }
-        .search-box-wrapper.expand { flex-grow: 1; width: 100%; }
-        
-        .search-field { width: 0; opacity: 0; height: 42px; border: none; border-radius: 25px; outline: none; transition: all 0.4s ease; background: #fff; font-size: 14px; padding: 0; }
-        .search-field.active { width: 100%; opacity: 1; padding: 0 15px 0 15px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-right: -42px; z-index: 1; box-sizing: border-box; }
-        
-        .search-circle-btn { width: 42px; height: 42px; background: #fff; color: var(--primary); border: 2px solid #eee; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 2; transition: 0.3s; flex-shrink: 0; }
-        .search-circle-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .action-bar-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin: 15px 0; width: 100%; max-width: 450px; }
+        .copy-btn-main { background: #d90429; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(217, 4, 41, 0.2); display: flex; align-items: center; gap: 8px; }
+        .search-box-wrapper { display: flex; align-items: center; position: relative; }
+        .search-field { width: 0; opacity: 0; height: 40px; border: none; border-radius: 25px; outline: none; transition: all 0.4s ease; background: #fff; font-size: 14px; }
+        .search-field.active { width: 200px; opacity: 1; padding: 0 15px; margin-right: -45px; border: 2px solid #d90429; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .search-circle-btn { width: 48px; height: 48px; background: #fff; color: #d90429; border: 2px solid #eee; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 2; transition: 0.3s; }
+        .search-circle-btn.active { background: #d90429; color: #fff; border-color: #d90429; }
 
-        /* ফিল্টার ট্যাপ */
         .filter-container { display: flex; gap: 5px; width: 100%; max-width: 450px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
         .filter-btn { flex: 1; padding: 8px 8px; border: none; border-radius: 20px; background: white; color: var(--gray); font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap; }
         .filter-btn.active { background: var(--primary); color: white; }
 
-        /* রেজিস্ট্রেশন ফর্ম */
         #regPage { background: white; width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .reg-title { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 18px; font-weight: bold; }
         .reg-subtitle { text-align: center; color: #dc2626; font-size: 10px; margin-bottom: 15px; font-weight: bold; }
@@ -95,7 +86,6 @@
         
         #donorList { width: 100%; max-width: 450px; }
 
-        /* ডোনার কার্ড */
         .donor-card { background: white; width: 100%; border-radius: 12px; box-sizing: border-box; padding: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border: 1px solid #eef0f2; margin-bottom: 15px; position: relative; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -137,7 +127,7 @@
 
         .empty-state { text-align: center; padding: 30px; background: white; border-radius: 12px; color: var(--gray); margin-top: 20px; }
 
-        /* Success Animation */
+        /* Success Animation CSS */
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10001; backdrop-filter: blur(3px); }
         .success-box { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.8); opacity: 0; transition: all 0.3s ease; }
         .success-box.show { transform: scale(1); opacity: 1; }
@@ -149,31 +139,21 @@
 
 <body oncontextmenu="return false;"> 
     
-    <!-- Top Fixed Ad Banner -->
-    <div class="ad-banner-container" style="max-height: 120px;">
+    <div class="ad-banner-container">
         <span class="ad-label">ADVERTISEMENT</span>
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:100%;height:100px"
-             data-ad-client="ca-pub-7071939918593154"
-             data-ad-format="horizontal"
-             data-full-width-responsive="false"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+        <div class="ad-placeholder">
+            <a href="#" target="_blank">
+                <img src="https://via.placeholder.com/400x80?text=Donate+Blood+Save+Life" alt="Ad">
+            </a>
+        </div>
     </div>
 
     <div class="action-bar-container" id="topActionArea" style="display: none;">
-        
-        <div id="actionButtons" class="action-buttons">
-            <button class="copy-btn-main" onclick="copyMySite(event)">
-                <i class="fas fa-share-alt"></i> Share
-            </button>
-            <button class="download-btn-main" id="manualDownloadBtn">
-                <i class="fas fa-download"></i> App
-            </button>
-        </div>
+        <button class="copy-btn-main" onclick="copyMySite(event)">
+            <i class="fas fa-link"></i> Share
+        </button>
 
-        <div class="search-box-wrapper" id="searchWrapper">
+        <div class="search-box-wrapper">
             <input type="text" id="searchInput" class="search-field" placeholder="নাম বা গ্রুপ খুঁজুন..." onkeyup="loadDonors()">
             <button class="search-circle-btn" id="searchBtn" onclick="toggleSearch()">
                 <i class="fas fa-search" id="searchIcon"></i>
@@ -274,13 +254,13 @@
     </div>
 
     <script>
-        // অ্যান্টি-কপি কীবোর্ড শর্টকাট
+        // অ্যান্টি-কপি: কীবোর্ড শর্টকাট বন্ধ করা হলো
         document.addEventListener('keydown', function(e) {
             if(e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C')) { e.preventDefault(); return false; }
             if(e.key === 'F12') { e.preventDefault(); return false; }
         });
 
-        // ফায়ারবেস কনফিগারেশন 
+ // ফায়ারবেস কনফিগারেশন লুকানো (Base64 Encode)
         const _0xdbKey = "eyJhcGlLZXkiOiJBSXphU3lCcldlc3FfdDVmdVVQY0Nmd0tEZHBJakJhSHVtaFFnLWciLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYmxvb2QtZG9ub3Itb25saW5lLWRlZmF1bHQtcnRkYi5maXJlYmFzZWlvLmNvbSIsInByb2plY3RJZCI6ImJsb29kLWRvbm9yLW9ubGluZSJ9";
         const firebaseConfig = JSON.parse(atob(_0xdbKey));
         
@@ -294,32 +274,16 @@
         function copyMySite(e) {
             const infoText = "আসসালামু আলাইকুম,\nজরুরি প্রয়োজনে রক্তের ডোনার খুঁজে পেতে এই ওয়েবসাইটটি ব্যবহার করুন।\n\nলিঙ্ক: https://blood-donor-online.netlify.app/";
             if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(infoText).then(() => { showHBToast(); }).catch(err => { fallbackCopy(infoText); }); } else { fallbackCopy(infoText); }
-            if(e){ const btn = e.currentTarget; const circle = document.createElement("span"); circle.style.width = circle.style.height = "50px"; circle.style.position = "absolute"; circle.style.background = "rgba(255,255,255,0.3)"; circle.style.borderRadius = "50%"; circle.style.left = "50%"; circle.style.top = "50%"; circle.style.transform = "translate(-50%, -50%) scale(0)"; circle.style.animation = "rippleHB 0.4s linear"; btn.appendChild(circle); setTimeout(() => circle.remove(), 400); }
+            const btn = e.currentTarget; const circle = document.createElement("span"); circle.style.width = circle.style.height = "50px"; circle.style.position = "absolute"; circle.style.background = "rgba(255,255,255,0.3)"; circle.style.borderRadius = "50%"; circle.style.left = "50%"; circle.style.top = "50%"; circle.style.transform = "translate(-50%, -50%) scale(0)"; circle.style.animation = "rippleHB 0.4s linear"; btn.appendChild(circle); setTimeout(() => circle.remove(), 400);
         }
 
         function fallbackCopy(text) { const textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select(); try { document.execCommand('copy'); showHBToast(); } catch (err) { alert("কপি করা সম্ভব হচ্ছে না"); } document.body.removeChild(textArea); }
         function showHBToast() { const toast = document.getElementById("copyToast"); toast.className = "show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500); }
 
         function toggleSearch() {
-            const input = document.getElementById('searchInput'); 
-            const btn = document.getElementById('searchBtn'); 
-            const icon = document.getElementById('searchIcon');
-            const actionBtns = document.getElementById('actionButtons');
-            const searchWrap = document.getElementById('searchWrapper');
-            
-            input.classList.toggle('active'); 
-            btn.classList.toggle('active');
-            actionBtns.classList.toggle('hide'); 
-            searchWrap.classList.toggle('expand'); 
-            
-            if (input.classList.contains('active')) { 
-                input.focus(); 
-                icon.classList.replace('fa-search', 'fa-times'); 
-            } else { 
-                input.value = ""; 
-                icon.classList.replace('fa-times', 'fa-search'); 
-                loadDonors(); 
-            }
+            const input = document.getElementById('searchInput'); const btn = document.getElementById('searchBtn'); const icon = document.getElementById('searchIcon');
+            input.classList.toggle('active'); btn.classList.toggle('active');
+            if (input.classList.contains('active')) { input.focus(); icon.classList.replace('fa-search', 'fa-times'); } else { input.value = ""; icon.classList.replace('fa-times', 'fa-search'); loadDonors(); }
         }
 
         function refreshHeader() {
@@ -363,6 +327,7 @@
                 btn.innerHTML = originalText; btn.disabled = false;
                 
                 showSuccess(); 
+                
                 refreshHeader(); 
                 setFilter('all', document.querySelector('.filter-btn')); 
                 showFeed(); 
@@ -392,7 +357,6 @@
             database.ref('donors/').on('value', (snapshot) => {
                 const list = document.getElementById('donorList'); list.innerHTML = ""; 
                 let totalDonors = 0, onlineDonors = 0, offlineDonors = 0;
-                let visibleCardCount = 0; 
 
                 if (!snapshot.exists()) {
                     document.getElementById('countTotal').innerText = "0"; document.getElementById('countOnline').innerText = "0"; document.getElementById('countOffline').innerText = "0";
@@ -416,8 +380,6 @@
                         const locMatch = data.loc ? data.loc.toLowerCase().includes(searchText) : false;
                         if (!nameMatch && !bloodMatch && !locMatch) return;
                     }
-
-                    visibleCardCount++; 
 
                     const statusClass = (data.canDonate === "হ্যাঁ") ? "status-yes" : "status-no";
                     const statusText = (data.canDonate === "হ্যাঁ") ? "● এখন রক্ত দিতে পারবেন" : "○ এখন রক্ত দিতে পারবেন না";
@@ -466,30 +428,9 @@
                                 ${isMyPost ? `<button type="button" class="btn btn-del-card" onclick="deletePost('${key}')"><i class="fas fa-trash-alt"></i> ডিলিট করুন</button>` : ''}
                             </div>
                         </div>`;
-
-                    // Dynamic Fixed Banner Ads
-                    if (visibleCardCount % 3 === 0) {
-                        list.innerHTML += `
-                        <div class="ad-banner-container" style="max-height: 120px;">
-                            <span class="ad-label">ADVERTISEMENT</span>
-                            <ins class="adsbygoogle"
-                                 style="display:inline-block;width:100%;height:100px"
-                                 data-ad-client="ca-pub-7071939918593154"
-                                 data-ad-format="horizontal"
-                                 data-full-width-responsive="false"></ins>
-                        </div>`;
-                    }
                 });
 
                 document.getElementById('countTotal').innerText = totalDonors; document.getElementById('countOnline').innerText = onlineDonors; document.getElementById('countOffline').innerText = offlineDonors;
-                
-                // Ads execution trigger
-                setTimeout(() => {
-                    try {
-                        const ads = document.querySelectorAll('#donorList .adsbygoogle:empty');
-                        ads.forEach(() => { (adsbygoogle = window.adsbygoogle || []).push({}); });
-                    } catch (e) { console.log(e); }
-                }, 500);
             });
         }
 
@@ -519,7 +460,6 @@
                 });
             }
         }
-
         function updateUI() {
             if(myKey) {
                 document.getElementById('formTitle').innerHTML = "<i class='fas fa-user-cog'></i> প্রোফাইল আপডেট করুন";
@@ -564,31 +504,31 @@
     <script>
         let deferredPrompt;
 
+        // ১. সার্ভিস ওয়ার্কার রেজিস্টার 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(() => console.log("Service Worker Registered"))
                 .catch(err => console.log("SW Error:", err));
         }
 
+        // ২. পপ-আপ কন্ট্রোল (ফোনে থাকলে আসবে না, না থাকলে আসবে)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); 
             deferredPrompt = e;
             
+            // চেক: অ্যাপ যদি অলরেডি ইনস্টল থাকে, তবে পপ-আপ দেখাবে না
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 return; 
             }
 
+            // ৩ সেকেন্ড পর পপ-আপ এনিমেশন আসবে
             setTimeout(() => {
                 const popup = document.getElementById('pwa-popup');
                 if(popup) popup.style.display = 'flex';
             }, 3000);
         });
 
-        document.getElementById('manualDownloadBtn').addEventListener('click', () => {
-            const popup = document.getElementById('pwa-popup');
-            if(popup) popup.style.display = 'flex';
-        });
-
+        // ৩. ইনস্টল বাটন কাজ
         document.getElementById('pwa-install').addEventListener('click', async () => {
             const popup = document.getElementById('pwa-popup');
             if(popup) popup.style.display = 'none';
@@ -602,6 +542,7 @@
             }
         });
 
+        // ৪. ক্লোজ বাটন
         document.getElementById('pwa-close').addEventListener('click', () => {
             const popup = document.getElementById('pwa-popup');
             if(popup) popup.style.display = 'none';
