@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth style-scroll">
+<head>
+  <!-- Safe Console Proxy to prevent platform crashes from Circular JSON -->
+  <script>
+    (function() {
+      const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        info: console.info
+      };
+      
+      function sanitizeArgs(args) {
+        return args.map(arg => {
+          if (typeof arg === 'object' && arg !== null) {
+            try {
+              return JSON.stringify(arg);
+            } catch (e) {
+              return "[Complex Object/Circular Reference]";
+            }
+          }
+          return String(arg);
+        });
+      }
+
+      console.log = function(...args) { originalConsole.log.apply(console, sanitizeArgs(args)); };
+      console.warn = function(...args) { originalConsole.warn.apply(console, sanitizeArgs(args)); };
+      console.error = function(...args) { originalConsole.error.apply(console, sanitizeArgs(args)); };
+      console.info = function(...args) { originalConsole.info.apply(console, sanitizeArgs(args)); };
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HT Farhan Portfolio & Review Platform</title>
+  <meta name="description" content="Personal portfolio and live review commenting application with universal authentication support across any domain.">
+  <meta property="og:title" content="HT Farhan Portfolio & Review Platform">
+  <meta property="og:description" content="Personal portfolio and live review commenting application with universal authentication support across any domain.">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome CDN for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  
+  <!-- EmailJS Library for Auto Email Notifications -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      // TODO: Replace with your actual EmailJS Public Key
+      emailjs.init("6z-SbfyjYBq8b6N5E"); 
+    })();
+  </script>
+
+  <style>
+    html { scroll-padding-top: 75px; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow-x: hidden;}
+    .font-handwriting { font-family: 'Caveat', cursive; }
+
+    /* Base Animated Items */
+    .anim-item {
+      opacity: 0;
+      will-change: transform, opacity;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .anim-pop { transform: scale(0.8) translateY(15px); }
+    .anim-left { transform: translateX(-30px); }
+    .anim-right { transform: translateX(30px); }
+    .anim-up { transform: translateY(25px); }
+
+    .anim-item.active {
+      opacity: 1;
+      transform: scale(1) translate(0, 0);
+    }
+
+    /* Floating & Pulsing Effect */
+    @keyframes floatText {
+      0%, 100% { transform: translateY(0px) rotate(-8deg); }
+      50% { transform: translateY(-5px) rotate(-6deg); }
+    }
+    .animate-float { animation: floatText 3s ease-in-out infinite; }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+    }
+    .animate-glow { animation: pulseGlow 2.5s infinite; }
+
+    /* Custom Button Click Animation */
+    .btn-press {
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-press:active {
+      transform: scale(0.93) !important;
+    }
+
+    /* Soft Card Styling - ORIGINAL DESIGN */
+    .card-soft {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-soft:hover {
+      background: #ffffff;
+      border-color: rgba(147, 197, 253, 0.8);
+      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Fullscreen Menu Animation */
+    .menu-overlay {
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .menu-overlay.open {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: scale(1) translateY(0) !important;
+    }
+    .menu-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .menu-overlay.open .menu-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animated Pop Notification Toast */
+    #toastBox {
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    }
+    #toastBox.toast-show {
+      transform: translateY(0) scale(1) !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen sm:flex sm:items-center sm:justify-center p-0 sm:p-4 text-slate-800">
+
+  <!-- ANIMATED TOAST NOTIFICATION POP -->
+  <div id="toastBox" class="fixed top-5 left-1/2 -translate-x-1/2 z-[800] opacity-0 pointer-events-none -translate-y-10 scale-90 bg-slate-900/90 text-white text-xs font-semibold px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-2.5 border border-slate-700/50">
+    <i id="toastIcon" class="fa-solid fa-circle-info text-blue-400 text-sm"></i>
+    <span id="toastMsg">মেসেজ নোটিফিকেশন</span>
+  </div>
+
+  <!-- Main Container -->
+  <div id="home" class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto bg-slate-50 min-h-screen sm:rounded-[36px] shadow-xl relative pb-10 pt-16 border border-slate-200">
+    
+    <!-- FIXED HEADER -->
+    <header class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-4xl lg:max-w-5xl px-5 md:px-8 py-3 bg-white/95 backdrop-blur-md z-50 border-b border-slate-200/80 shadow-xs flex flex-col justify-center">
+      <div class="flex items-center justify-between w-full">
+        <a href="#home" class="flex items-center gap-2.5 btn-press">
+          <div class="text-blue-600 text-xl animate-bounce">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+          <div>
+            <h1 class="text-base md:text-lg font-bold text-blue-900 leading-none">HT<span class="text-blue-600"> Farhan</span></h1>
+            <p class="text-[9px] md:text-[11px] text-slate-400 font-medium">Not just a profile, it's my story</p>
+          </div>
+        </a>
+        <div class="flex items-center gap-2 text-slate-600">
+          <!-- Language Toggle Button -->
+          <button onclick="toggleLanguage()" class="btn-press flex items-center bg-slate-200/60 rounded-full p-0.5 border border-slate-300 shadow-inner" title="Change Language">
+            <span id="langEnBtn" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white shadow-sm text-blue-600 transition-all">EN</span>
+            <span id="langBnBtn" class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-500 transition-all">BN</span>
+          </button>
+
+          <button onclick="toggleMenu(true)" title="Menu" class="btn-press w-8 h-8 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all font-bold">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- FULLSCREEN ANIMATED MENU OVERLAY -->
+    <div id="fullMenuModal" class="menu-overlay fixed inset-0 bg-white/98 backdrop-blur-xl z-[200] opacity-0 pointer-events-none scale-95 translate-y-4 flex flex-col justify-between p-6 md:p-10 transition-all">
+      <div class="w-full max-w-md mx-auto pt-2">
+        <div class="bg-slate-100/80 rounded-full px-5 py-2.5 flex items-center justify-between border border-slate-200 shadow-inner">
+          <span class="font-extrabold text-slate-800 text-base md:text-lg tracking-wide">HT Farhan</span>
+          <button onclick="toggleMenu(false)" class="btn-press text-slate-700 hover:text-black p-1">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center justify-center space-y-5 md:space-y-6 my-auto text-center font-extrabold text-2xl md:text-3xl text-slate-900">
+        <a href="#home" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 100ms;">Home</a>
+        <a href="#about" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 150ms;">About & Termux</a>
+        <a href="#skills-services" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 200ms;">Skills & Services</a>
+        <a href="#contact" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 250ms;">Contact & Socials</a>
+        <a href="#experience" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 300ms;">Experience & Gallery</a>
+        <a href="#video-player" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 350ms;">YouTube / Video</a>
+        <a href="#comments-section" onclick="toggleMenu(false)" class="menu-item transition-all hover:text-blue-600 hover:scale-105" style="transition-delay: 400ms;">Comments & Reviews</a>
+      </div>
+
+      <div class="text-center text-xs text-slate-400 font-medium">
+        © HT Farhan • All Systems Connected
+      </div>
+    </div>
+
+    <!-- COVER & MAIN PROFILE SECTION -->
+    <div class="relative bg-cover bg-center pt-6 pb-6 px-4 md:px-8 border-b border-slate-100" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.65), rgba(248, 250, 252, 1)), url('https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=1200&q=80');">
+      <div class="absolute right-5 md:right-8 top-4 text-slate-800 text-right pointer-events-none animate-float z-10 anim-item anim-pop">
+        <span class="font-handwriting text-2xl md:text-3xl font-bold leading-tight block text-sky-400 drop-shadow-md">Dream<br>Learn<br>Build</span>
+      </div>
+
+      <div class="flex flex-col items-center relative z-10 text-center">
+        <div class="anim-item anim-pop relative mb-2 cursor-pointer group" onclick="openImageModal('https://i.postimg.cc/qRTpMFsB/1788804281840.jpg')">
+          <img src="https://i.postimg.cc/qRTpMFsB/1788804281840.jpg" alt="HT Farhan" class="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover border-4 border-slate-900 shadow-md animate-glow group-hover:scale-105 transition-transform duration-300">
+          <span class="absolute bottom-1 right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] border-2 border-white shadow-xs">
+            <i class="fa-solid fa-check"></i>
+          </span>
+        </div>
+
+        <h2 class="anim-item anim-up text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-1.5">
+          HT Farhan
+        </h2>
+        <p class="anim-item anim-up text-xs md:text-sm font-semibold text-slate-700 mt-0.5">Developer | Cyber Security & Termux Specialist</p>
+        <p class="anim-item anim-up text-[11px] md:text-xs text-slate-600 italic mt-1 font-medium max-w-xs md:max-w-md">"Simple life, beautiful dreams."</p>
+
+        <div class="flex flex-wrap justify-center gap-2 mt-3">
+          <span class="anim-item anim-pop btn-press inline-flex items-center gap-1 bg-blue-100/90 text-blue-700 px-3 py-1 rounded-full text-[11px] font-semibold border border-blue-200 cursor-pointer hover:bg-blue-200 transition-colors" onclick="showToast('Location: Dhaka, Bangladesh', 'info')">
+            <i class="fa-solid fa-location-dot text-xs text-blue-500"></i> Bangladesh
+          </span>
+          <span class="anim-item anim-pop inline-flex items-center gap-1 bg-emerald-100/90 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-semibold border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Active Now
+          </span>
+          <span class="anim-item anim-pop inline-flex items-center gap-1 bg-sky-100/90 text-sky-700 px-3 py-1 rounded-full text-[11px] font-semibold border border-sky-200">
+            <i class="fa-solid fa-shield-halved text-xs text-sky-500"></i> Verified
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CARDS CONTAINER -->
+    <div class="px-4 md:px-8 mt-4 space-y-4">
+      
+      <!-- QUICK STATS -->
+      <div class="card-soft p-3 md:p-4 rounded-2xl shadow-xs text-center grid grid-cols-3 gap-2">
+        <a href="#contact" class="anim-item anim-pop btn-press p-1.5 block rounded-xl hover:bg-blue-50/50">
+          <i class="fa-solid fa-users text-blue-500 text-base md:text-lg mb-1 block"></i>
+          <span class="text-xs md:text-sm font-bold text-slate-800 block">10+</span>
+          <span class="text-[9px] md:text-[10px] text-slate-400 font-medium">Social Links</span>
+        </a>
+        <a href="#about" class="anim-item anim-pop btn-press p-1.5 border-x border-slate-100 block rounded-xl hover:bg-emerald-50/50">
+          <i class="fa-solid fa-terminal text-emerald-600 text-base md:text-lg mb-1 block"></i>
+          <span class="text-xs md:text-sm font-bold text-slate-800 block">Termux</span>
+          <span class="text-[9px] md:text-[10px] text-slate-400 font-medium">CLI Expert</span>
+        </a>
+        <div class="anim-item anim-pop btn-press p-1.5 cursor-pointer rounded-xl hover:bg-purple-50/50" onclick="showToast('Status: 100% Focused on Development & Cyber Security!', 'info')">
+          <i class="fa-solid fa-bullseye text-purple-600 text-base md:text-lg mb-1 block"></i>
+          <span class="text-xs md:text-sm font-bold text-slate-800 block">100%</span>
+          <span class="text-[9px] md:text-[10px] text-slate-400 font-medium">Focused</span>
+        </div>
+      </div>
+
+      <!-- ABOUT & TERMUX WORK SECTION -->
+      <div id="about" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card-soft p-4 rounded-2xl shadow-xs h-full">
+          <div class="anim-item anim-left flex items-center gap-2 mb-2">
+            <i class="fa-regular fa-user text-blue-600"></i>
+            <h3 class="text-sm font-bold text-slate-800">About Me</h3>
+          </div>
+          <p class="anim-item anim-up text-xs text-slate-600 leading-relaxed">
+            Hi, I'm HT Farhan. I am a front-end web developer and cyber security enthusiast. I specialize in Linux CLI environments like Termux, bash script automation, network security testing, and building modern web applications.
+          </p>
+        </div>
+
+        <div class="card-soft bg-emerald-50/40 border-emerald-200/80 p-4 rounded-2xl shadow-xs h-full">
+          <div class="anim-item anim-up flex items-center justify-between mb-2.5">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-emerald-700 text-base"></i>
+              <h3 class="text-sm font-bold text-emerald-950">Termux & Cyber Security</h3>
+            </div>
+            <span class="bg-emerald-200/80 text-emerald-800 text-[9px] px-2 py-0.5 rounded-full font-mono font-semibold">CLI & Audit</span>
+          </div>
+          <p class="anim-item anim-up text-[11px] text-slate-700 leading-relaxed mb-3">
+            I work with Android Linux terminal (Termux), bash scripting, security testing, and custom automation scripts for educational and defense purposes.
+          </p>
+          <div class="flex flex-wrap gap-1.5 text-[9px] font-mono">
+            <span class="anim-item anim-pop bg-white/90 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-md shadow-2xs">#Termux_CLI</span>
+            <span class="anim-item anim-pop bg-white/90 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-md shadow-2xs">#Bash_Scripting</span>
+            <span class="anim-item anim-pop bg-white/90 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-md shadow-2xs">#Linux_Env</span>
+            <span class="anim-item anim-pop bg-white/90 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-md shadow-2xs">#Kali_Linux</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKILLS & SERVICES -->
+      <div id="skills-services" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- SKILLS CARD -->
+        <div class="card-soft p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-left flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-laptop-code text-blue-600 text-sm"></i>
+            <h3 class="text-xs font-bold text-slate-800">Skills & Technical Stack</h3>
+          </div>
+          <div class="space-y-2 text-[11px]">
+            <div>
+              <div class="flex justify-between font-semibold mb-1 text-slate-700">
+                <span>HTML, CSS & JavaScript</span>
+                <span class="text-blue-600">85%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 85%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1 text-slate-700">
+                <span>Termux & Bash Scripting</span>
+                <span class="text-emerald-600">90%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 90%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1 text-slate-700">
+                <span>Cyber Security & Network Audit</span>
+                <span class="text-purple-600">80%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-purple-600 h-1.5 rounded-full" style="width: 80%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold mb-1 text-slate-700">
+                <span>Tailwind CSS & UI Design</span>
+                <span class="text-sky-600">88%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-sky-500 h-1.5 rounded-full" style="width: 88%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SERVICES CARD -->
+        <div class="card-soft p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-right flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-gears text-blue-600 text-sm"></i>
+            <h3 class="text-xs font-bold text-slate-800">Services & Solutions</h3>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[10px]">
+            <div class="p-2 bg-slate-50/80 rounded-xl border border-slate-100 hover:bg-blue-50/40 transition-colors">
+              <i class="fa-solid fa-code text-blue-500 mb-1"></i>
+              <p class="font-bold text-slate-800">Web App Dev</p>
+              <p class="text-slate-400 text-[9px]">Responsive Front-End UI</p>
+            </div>
+            <div class="p-2 bg-slate-50/80 rounded-xl border border-slate-100 hover:bg-emerald-50/40 transition-colors">
+              <i class="fa-solid fa-terminal text-emerald-600 mb-1"></i>
+              <p class="font-bold text-slate-800">Termux Scripts</p>
+              <p class="text-slate-400 text-[9px]">Automated Tools Setup</p>
+            </div>
+            <div class="p-2 bg-slate-50/80 rounded-xl border border-slate-100 hover:bg-purple-50/40 transition-colors">
+              <i class="fa-solid fa-shield-halved text-purple-600 mb-1"></i>
+              <p class="font-bold text-slate-800">Security Audit</p>
+              <p class="text-slate-400 text-[9px]">Vulnerability Testing</p>
+            </div>
+            <div class="p-2 bg-slate-50/80 rounded-xl border border-slate-100 hover:bg-amber-50/40 transition-colors">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mb-1"></i>
+              <p class="font-bold text-slate-800">Custom UI/UX</p>
+              <p class="text-slate-400 text-[9px]">Tailwind & Animations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT INFO & SOCIAL MEDIA -->
+      <div id="contact" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <div class="card-soft p-3.5 md:p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-left flex items-center gap-1.5 mb-3">
+            <i class="fa-regular fa-envelope text-blue-600 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-800">Contact Info</h3>
+          </div>
+          <div class="space-y-2 text-[10px]">
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Email</p>
+              <p class="text-slate-700 font-semibold truncate">farhan@example.com</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Phone / WhatsApp</p>
+              <p class="text-slate-700 font-semibold">+880 1700 000000</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Location</p>
+              <p class="text-slate-700 font-semibold">Dhaka, Bangladesh</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Date of Birth</p>
+              <p class="text-slate-700 font-semibold">12 March 2003</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOCIAL MEDIA CARD -->
+        <div class="card-soft p-3.5 md:p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-right flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <i class="fa-solid fa-share-nodes text-blue-600 text-xs"></i>
+              <h3 class="text-xs font-bold text-slate-800">Social Networks</h3>
+            </div>
+            <span class="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold border border-blue-100">10 Connected</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <a href="https://t.me" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-sky-50 rounded-lg transition-all border border-transparent hover:border-sky-100">
+              <i class="fa-brands fa-telegram text-sky-500 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">Telegram</span>
+            </a>
+            <a href="https://facebook.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100">
+              <i class="fa-brands fa-facebook text-blue-600 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">Facebook</span>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-pink-50 rounded-lg transition-all border border-transparent hover:border-pink-100">
+              <i class="fa-brands fa-instagram text-pink-500 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">Instagram</span>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-100">
+              <i class="fa-brands fa-youtube text-red-500 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">YouTube</span>
+            </a>
+            <a href="https://github.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-slate-100 rounded-lg transition-all border border-transparent hover:border-slate-200">
+              <i class="fa-brands fa-github text-slate-800 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">GitHub</span>
+            </a>
+            <a href="https://wa.me" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-emerald-50 rounded-lg transition-all border border-transparent hover:border-emerald-100">
+              <i class="fa-brands fa-whatsapp text-emerald-500 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">WhatsApp</span>
+            </a>
+            <a href="https://x.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-slate-100 rounded-lg transition-all border border-transparent hover:border-slate-200">
+              <i class="fa-brands fa-x-twitter text-slate-800 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">Twitter / X</span>
+            </a>
+            <a href="https://discord.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-indigo-50 rounded-lg transition-all border border-transparent hover:border-indigo-100">
+              <i class="fa-brands fa-discord text-indigo-500 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">Discord</span>
+            </a>
+            <a href="https://linkedin.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100">
+              <i class="fa-brands fa-linkedin text-blue-700 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">LinkedIn</span>
+            </a>
+            <a href="https://tiktok.com" target="_blank" class="anim-item anim-right btn-press flex items-center gap-1.5 p-1.5 hover:bg-slate-100 rounded-lg transition-all border border-transparent hover:border-slate-200">
+              <i class="fa-brands fa-tiktok text-slate-900 text-xs"></i>
+              <span class="text-[10px] font-bold text-slate-700 truncate">TikTok</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONAL INFO & BACKGROUND -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <div class="card-soft p-3.5 md:p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-left flex items-center gap-1.5 mb-3">
+            <i class="fa-regular fa-address-card text-blue-600 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-800">Personal Info</h3>
+          </div>
+          <div class="space-y-2 text-[10px]">
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Full Name</p>
+              <p class="text-slate-700 font-semibold">HT Farhan</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Gender</p>
+              <p class="text-slate-700 font-semibold">Male</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Nationality</p>
+              <p class="text-slate-700 font-semibold">Bangladeshi</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Religion</p>
+              <p class="text-slate-700 font-semibold">Islam</p>
+            </div>
+            <div class="anim-item anim-left">
+              <p class="text-slate-400 font-medium">Blood Group</p>
+              <p class="text-slate-700 font-semibold">B+</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-soft p-3.5 md:p-4 rounded-2xl shadow-xs">
+          <div class="anim-item anim-right flex items-center gap-1.5 mb-3">
+            <i class="fa-solid fa-user-graduate text-blue-600 text-xs"></i>
+            <h3 class="text-xs font-bold text-slate-800">Background</h3>
+          </div>
+          <div class="space-y-2 text-[10px]">
+            <div class="anim-item anim-right">
+              <p class="text-slate-400 font-medium">Education</p>
+              <p class="text-slate-700 font-semibold">B.Sc. Studies (In Progress)</p>
+            </div>
+            <div class="anim-item anim-right">
+              <p class="text-slate-400 font-medium">Profession</p>
+              <p class="text-slate-700 font-semibold">Student & Developer</p>
+            </div>
+            <div class="anim-item anim-right">
+              <p class="text-slate-400 font-medium">Marital Status</p>
+              <p class="text-slate-700 font-semibold">Single</p>
+            </div>
+            <div class="anim-item anim-right">
+              <p class="text-slate-400 font-medium">Hobbies & Games</p>
+              <p class="text-slate-700 font-semibold">Coding, Scripting, Carrom, Ludo</p>
+            </div>
+            <div class="anim-item anim-right">
+              <p class="text-slate-400 font-medium">Language</p>
+              <p class="text-slate-700 font-semibold">Bangla, English</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALLERY & TIMELINE -->
+      <div id="experience" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card-soft p-4 rounded-2xl shadow-xs h-full">
+          <div class="anim-item anim-left flex items-center mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-regular fa-image text-blue-600"></i>
+              <h3 class="text-sm font-bold text-slate-800">Gallery</h3>
+            </div>
+          </div>
+          <div class="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
+            <style>.hide-scrollbar::-webkit-scrollbar { display: none; }</style>
+            <img src="https://i.postimg.cc/qRTpMFsB/1788804281840.jpg" onclick="openImageModal('https://i.postimg.cc/qRTpMFsB/1788804281840.jpg')" class="anim-item anim-pop btn-press w-32 h-20 flex-shrink-0 snap-center object-cover rounded-lg cursor-pointer hover:opacity-85 transition-all">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" onclick="openImageModal('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80')" class="anim-item anim-pop btn-press w-32 h-20 flex-shrink-0 snap-center object-cover rounded-lg cursor-pointer hover:opacity-85 transition-all">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" onclick="openImageModal('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80')" class="anim-item anim-pop btn-press w-32 h-20 flex-shrink-0 snap-center object-cover rounded-lg cursor-pointer hover:opacity-85 transition-all">
+            <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&q=80" onclick="openImageModal('https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80')" class="anim-item anim-pop btn-press w-32 h-20 flex-shrink-0 snap-center object-cover rounded-lg cursor-pointer hover:opacity-85 transition-all">
+            <img src="https://images.unsplash.com/photo-1511497584788-8767611136f6?auto=format&fit=crop&w=300&q=80" onclick="openImageModal('https://images.unsplash.com/photo-1511497584788-8767611136f6?auto=format&fit=crop&w=800&q=80')" class="anim-item anim-pop btn-press w-32 h-20 flex-shrink-0 snap-center object-cover rounded-lg cursor-pointer hover:opacity-85 transition-all">
+          </div>
+        </div>
+
+        <div class="card-soft p-4 rounded-2xl shadow-xs h-full">
+          <div class="anim-item anim-left flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-blue-600"></i>
+              <h3 class="text-sm font-bold text-slate-800">Education & Experience</h3>
+            </div>
+            <button onclick="showToast('2023-Present: Linux Security & Shell Scripting\n2024-Present: Front-end Web Dev', 'info')" class="btn-press text-[11px] text-blue-500 font-medium hover:underline">View All</button>
+          </div>
+          
+          <div class="relative pl-5 border-l-2 border-slate-100 space-y-4">
+            <div class="anim-item anim-up relative flex items-center justify-between">
+              <span class="absolute -left-[25px] w-3 h-3 rounded-full bg-emerald-500 border-2 border-white shadow-xs"></span>
+              <div>
+                <span class="text-[10px] text-slate-400 font-medium">2023 – Present</span>
+                <h4 class="text-xs font-bold text-slate-800">Termux & Linux Security</h4>
+                <p class="text-[10px] text-slate-400">Terminal Shell Automation</p>
+              </div>
+              <span class="bg-emerald-100/80 text-emerald-700 text-[9px] px-2 py-0.5 rounded-full font-semibold">Security</span>
+            </div>
+
+            <div class="anim-item anim-up relative flex items-center justify-between">
+              <span class="absolute -left-[25px] w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-xs"></span>
+              <div>
+                <span class="text-[10px] text-slate-400 font-medium">2024 – Present</span>
+                <h4 class="text-xs font-bold text-slate-800">Web Development</h4>
+                <p class="text-[10px] text-slate-400">HTML, CSS, JS & Web Apps</p>
+              </div>
+              <span class="bg-blue-100/80 text-blue-700 text-[9px] px-2 py-0.5 rounded-full font-semibold">Dev</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO PLAYER SECTION -->
+      <div id="video-player" class="card-soft text-slate-800 p-4 md:p-5 rounded-2xl shadow-xs relative overflow-hidden anim-item anim-up">
+        <div class="flex items-center justify-between mb-2.5 border-b border-slate-100 pb-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-brands fa-telegram text-sky-500 text-xl"></i>
+            <div>
+              <h3 class="text-xs font-bold tracking-wide uppercase text-slate-800">Telegram Video Player</h3>
+              <p class="text-[10px] text-slate-400 font-medium">Official Channel Stream</p>
+            </div>
+          </div>
+          <span class="bg-sky-50 text-sky-600 text-[9px] px-2.5 py-0.5 rounded-full border border-sky-100 font-semibold">HD Media</span>
+        </div>
+
+        <div class="mb-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+          <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-play text-sky-500 text-xs"></i> Termux CLI & Cyber Security Overview
+          </h4>
+          <p class="text-[10px] text-slate-500 mt-0.5">Learn Linux commands, bash scripting, and modern tool setup.</p>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden bg-slate-900 group border border-slate-200">
+          <video id="tgVideo" class="w-full aspect-video object-cover" poster="https://i.postimg.cc/qRTpMFsB/1788804281840.jpg">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+            Your browser does not support video playback.
+          </video>
+
+          <div id="videoControlsOverlay" class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition-all cursor-pointer" onclick="togglePlay()">
+            <div id="playBtn" class="btn-press w-12 h-12 md:w-14 md:h-14 bg-sky-500 text-white rounded-full flex items-center justify-center shadow-md">
+              <i class="fa-solid fa-play text-lg md:text-xl ml-1"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-3 text-[11px] text-slate-500">
+          <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-check text-sky-500"></i> HT Farhan Post</span>
+          <a href="https://t.me" target="_blank" rel="noopener noreferrer" class="btn-press text-sky-600 hover:underline flex items-center gap-1 font-semibold">
+            Watch in Telegram <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- COMMENT & REVIEWS SECTION -->
+      <div id="comments-section" class="space-y-4 py-2 anim-item anim-up card-soft p-4 md:p-6 rounded-2xl shadow-xs">
+        
+        <!-- Header -->
+        <div class="border-b border-slate-200/80 pb-3 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              <i class="fa-solid fa-comments text-blue-600"></i> Comments & Reviews
+            </h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">আপনার নাম এবং মতামত সরাসরি কমেন্ট পোস্ট করুন।</p>
+          </div>
+          <button id="quickLoginBtn" onclick="openLoginModal()" class="btn-press text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl border border-blue-200/60 flex items-center gap-1.5 transition-all shadow-2xs">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Login / লগইন</span>
+          </button>
+        </div>
+
+        <!-- Filter & Comment Count -->
+        <div class="flex items-center justify-between text-xs pb-1">
+          <div class="text-slate-700 font-bold text-[11px]">
+            <span id="commentTotalText" class="underline decoration-blue-500 underline-offset-4">0 Comments</span>
+          </div>
+          <div class="flex bg-slate-100 p-0.5 rounded-lg font-medium text-[10px] border border-slate-200">
+            <button id="btnNewest" onclick="sortComments('newest')" class="btn-press px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-2xs font-bold">Newest</button>
+            <button id="btnOldest" onclick="sortComments('oldest')" class="btn-press px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition-colors">Oldest</button>
+          </div>
+        </div>
+
+        <!-- Write Comment Box (First write, then click post -> triggers login modal) -->
+        <div class="border border-slate-200/90 rounded-2xl overflow-hidden bg-white shadow-2xs p-3 space-y-2 relative">
+          
+          <!-- Logged In User Info (Hidden initially) -->
+          <div id="loggedInUserInfo" class="hidden flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 mb-2">
+            <div class="flex items-center gap-2">
+              <img id="loggedInAvatar" src="" class="w-7 h-7 rounded-full border border-slate-200 bg-white object-cover shadow-xs">
+              <div class="flex flex-col">
+                <span id="loggedInName" class="text-xs font-bold text-slate-700 leading-none mb-0.5"></span>
+                <span id="loggedInEmail" class="text-[9px] text-slate-500 leading-none"></span>
+              </div>
+              <i class="fa-solid fa-circle-check text-blue-500 text-[10px] ml-1"></i>
+            </div>
+            <button onclick="window.universalLogout && window.universalLogout()" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1.5 rounded-lg font-bold transition-colors">Logout / লগআউট</button>
+          </div>
+
+          <textarea id="commentInput" placeholder="Write an awesome comment here..." class="w-full h-16 text-xs bg-transparent resize-none focus:outline-none text-slate-700 placeholder:text-slate-400 pt-1"></textarea>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400 flex items-center gap-1 font-semibold">
+              <i class="fa-solid fa-shield-cat text-blue-500"></i> Fast & Live Posting
+            </span>
+            <button onclick="handleCommentSubmit()" class="btn-press bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2 rounded-xl flex items-center gap-2 shadow-md transition-colors">
+              <i class="fa-solid fa-paper-plane text-xs"></i> Post
+            </button>
+          </div>
+        </div>
+
+        <!-- Comments List -->
+        <div id="commentsContainer" class="divide-y divide-slate-100 pt-1 flex flex-col">
+          <!-- Default Comments loaded from JS -->
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- IMAGE PREVIEW MODAL -->
+  <div id="imageModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden z-[300] flex flex-col items-center justify-center p-4 transition-all" onclick="closeImageModal()">
+    <button onclick="closeImageModal()" class="btn-press absolute top-5 right-5 text-white text-xl w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="relative max-w-sm w-full" onclick="event.stopPropagation()">
+      <img id="modalImg" src="" alt="Image Preview" class="w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain border border-white/20 bg-black">
+    </div>
+  </div>
+
+  <!-- UNIVERSAL LOGIN MODAL (Works on ANY website/domain) -->
+  <div id="universalLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-[280] flex items-center justify-center p-4 transition-all" onclick="closeLoginModal()">
+    <div class="relative max-w-sm w-full bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 relative">
+        <button onclick="closeLoginModal()" class="btn-press absolute top-4 right-4 text-white/80 hover:text-white text-lg w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg shadow-inner">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold leading-tight">লগইন করুন / Sign In</h3>
+            <p class="text-[11px] text-blue-100 mt-0.5">যে কোনো ওয়েবসাইট থেকে সহজে মন্তব্য করতে লগইন করুন</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- Error / Info alert box for domain warnings -->
+        <div id="loginDomainAlert" class="hidden p-3 bg-amber-50 border border-amber-200/80 rounded-2xl text-[11px] text-amber-900 flex items-start gap-2.5 leading-relaxed">
+          <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5 shrink-0"></i>
+          <div>
+            <span class="font-bold block">এই ডোমেইনে Google Login ব্লকড/অননুমোদিত!</span>
+            <span class="text-amber-800">কোনো সমস্যা নেই, নিচের বক্সে আপনার নাম লিখে "লগইন সম্পন্ন করুন" বাটনে চাপুন। এটি ১ সেকেন্ডে ১০০% কাজ করবে।</span>
+          </div>
+        </div>
+
+        <!-- Option 1: Google Login -->
+        <div>
+          <button type="button" id="modalGoogleLoginBtn" onclick="triggerModalGoogleLogin()" class="btn-press w-full bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl border border-slate-300 flex items-center justify-center gap-2.5 shadow-2xs hover:shadow-xs transition-all">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="googleLoginText">Google দিয়ে লগইন</span>
+          </button>
+        </div>
+
+        <div class="relative flex py-0.5 items-center">
+          <div class="flex-grow border-t border-slate-200"></div>
+          <span class="flex-shrink mx-3 text-slate-400 text-[10px] uppercase tracking-wider font-semibold">অথবা সরাসরি নাম ও ছবি দিয়ে</span>
+          <div class="flex-grow border-t border-slate-200"></div>
+        </div>
+
+        <!-- Option 2: Instant Name & Profile Login (Guaranteed to work everywhere) -->
+        <form onsubmit="handleDirectLoginSubmit(event)" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">আপনার নাম (Full Name) <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <i class="fa-solid fa-user absolute left-3 top-3 text-slate-400 text-xs"></i>
+              <input type="text" id="directLoginName" required placeholder="যেমন: Farhan Ahmed" class="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-colors" oninput="updateAvatarPreview()">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">ইমেইল (Email) <span class="text-slate-400 font-normal">(ঐচ্ছিক)</span></label>
+            <div class="relative">
+              <i class="fa-solid fa-envelope absolute left-3 top-3 text-slate-400 text-xs"></i>
+              <input type="email" id="directLoginEmail" placeholder="যেমন: farhan@gmail.com" class="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-colors">
+            </div>
+          </div>
+
+          <!-- Avatar Preview / Selection -->
+          <div class="pt-0.5">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">প্রোফাইল অবতার নির্বাচন করুন</label>
+            <div class="flex items-center gap-2.5">
+              <img id="directAvatarPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=Farhan&backgroundColor=0284c7" class="w-9 h-9 rounded-full border border-slate-200 bg-slate-100 object-cover shadow-2xs shrink-0">
+              <div class="flex items-center gap-1.5 overflow-x-auto py-1">
+                <button type="button" onclick="selectAvatarPreset('Felix', '0284c7')" class="w-7 h-7 rounded-full border border-slate-200 overflow-hidden hover:scale-110 transition-transform"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix&backgroundColor=0284c7" class="w-full h-full"></button>
+                <button type="button" onclick="selectAvatarPreset('Aria', '10b981')" class="w-7 h-7 rounded-full border border-slate-200 overflow-hidden hover:scale-110 transition-transform"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aria&backgroundColor=10b981" class="w-full h-full"></button>
+                <button type="button" onclick="selectAvatarPreset('Leo', 'f59e0b')" class="w-7 h-7 rounded-full border border-slate-200 overflow-hidden hover:scale-110 transition-transform"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Leo&backgroundColor=f59e0b" class="w-full h-full"></button>
+                <button type="button" onclick="selectAvatarPreset('Zoe', 'ec4899')" class="w-7 h-7 rounded-full border border-slate-200 overflow-hidden hover:scale-110 transition-transform"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Zoe&backgroundColor=ec4899" class="w-full h-full"></button>
+                <button type="button" onclick="selectAvatarPreset('Max', '6366f1')" class="w-7 h-7 rounded-full border border-slate-200 overflow-hidden hover:scale-110 transition-transform"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Max&backgroundColor=6366f1" class="w-full h-full"></button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-press w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition-all mt-2">
+            <i class="fa-solid fa-check"></i>
+            <span>লগইন সম্পন্ন করুন</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-slate-50 px-5 py-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+        <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-emerald-500"></i> ১০০% নিরাপদ ও ফ্রি</span>
+        <span class="flex items-center gap-1"><i class="fa-solid fa-globe text-blue-500"></i> যে কোনো সাইটেই কাজ করবে</span>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentUser = null; 
+    let pendingCommentText = "";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Intersection Observer for Scroll Animations
+      const animatedElements = document.querySelectorAll('.anim-item');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          } else {
+            entry.target.classList.remove('active');
+          }
+        });
+      }, { 
+        threshold: 0.1,
+        rootMargin: "0px 0px -20px 0px"
+      });
+      animatedElements.forEach(el => observer.observe(el));
+
+      initCommentsSystem();
+    });
+
+    // Toast Notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toastBox');
+      const msg = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+
+      msg.innerText = message;
+      if (type === 'error') {
+        icon.className = 'fa-solid fa-triangle-exclamation text-amber-400 text-sm';
+      } else if (type === 'success') {
+        icon.className = 'fa-solid fa-circle-check text-emerald-400 text-sm';
+      } else {
+        icon.className = 'fa-solid fa-circle-info text-blue-400 text-sm';
+      }
+
+      toast.classList.add('toast-show');
+      setTimeout(() => {
+        toast.classList.remove('toast-show');
+      }, 3000);
+    }
+
+    // Toggle Fullscreen Menu Modal
+    function toggleMenu(show) {
+      const menuModal = document.getElementById('fullMenuModal');
+      if (show) {
+        menuModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      } else {
+        menuModal.classList.remove('open');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Video Player Logic
+    function togglePlay() {
+      const video = document.getElementById('tgVideo');
+      const playBtn = document.getElementById('playBtn');
+      const overlay = document.getElementById('videoControlsOverlay');
+
+      if (video.paused) {
+        video.play();
+        playBtn.innerHTML = '<i class="fa-solid fa-pause text-lg md:text-xl"></i>';
+        overlay.classList.add('opacity-0', 'hover:opacity-100');
+      } else {
+        video.pause();
+        playBtn.innerHTML = '<i class="fa-solid fa-play text-lg md:text-xl ml-1"></i>';
+        overlay.classList.remove('opacity-0');
+      }
+    }
+
+    // Image Modal Logic
+    function openImageModal(src) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      modalImg.src = src;
+      modal.classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.add('hidden');
+    }
+
+    // --- REAL GOOGLE LOGIN & COMMENT LOGIC ---
+    /* 
+       NOTE FOR ADMIN: 
+       Copy the HTML below and paste it into your EmailJS Template (Source Code mode <>)
+       
+       ------------------------------------------------------------
+       <div style="font-family: system-ui, sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; color: #1e293b; background-color: #ffffff;">
+         <h2 style="color: #2563eb; font-size: 18px; margin-top: 0;">{{subject}}</h2>
+         <p>Hi <strong>{{to_name}}</strong>,</p>
+         <p>New activity detected on HT Farhan Profile.</p>
+         <div style="background-color: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #f1f5f9; margin: 20px 0;">
+           <p style="margin: 0; font-size: 14px;"><strong>From:</strong> {{name}}</p>
+           <p style="margin: 5px 0 0 0; font-size: 13px; color: #64748b;"><strong>Email:</strong> {{sender_email}}</p>
+           <div style="margin-top: 12px; font-size: 15px; color: #334155; line-height: 1.5; font-style: italic;">"{{comment}}"</div>
+         </div>
+         <div style="text-align: center; margin-top: 30px;">
+           <a href="{{view_url}}" style="background-color: #2563eb; color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block;">View Comment</a>
+         </div>
+         <p style="border-top: 1px solid #f1f5f9; margin-top: 30px; padding-top: 20px; font-size: 12px; color: #94a3b8; text-align: center;">Best regards,<br>HT Farhan Website Team</p>
+       </div>
+       ------------------------------------------------------------
+    */
+    
+    let commentsData = [];
+    let selectedAvatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=Farhan&backgroundColor=0284c7";
+
+    function selectAvatarPreset(seed, bg) {
+      selectedAvatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${bg || '0284c7'}`;
+      const preview = document.getElementById('directAvatarPreview');
+      if (preview) preview.src = selectedAvatarUrl;
+    }
+
+    function updateAvatarPreview() {
+      const nameInput = document.getElementById('directLoginName');
+      if (nameInput) {
+        const name = nameInput.value.trim();
+        if (name) {
+          selectedAvatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0284c7`;
+          const preview = document.getElementById('directAvatarPreview');
+          if (preview) preview.src = selectedAvatarUrl;
+        }
+      }
+    }
+
+    function openLoginModal() {
+      const modal = document.getElementById('universalLoginModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        const alertBox = document.getElementById('loginDomainAlert');
+        const isOfflineOrContent = window.location.protocol === 'content:' || 
+                                   window.location.protocol === 'file:' || 
+                                   !window.location.protocol.startsWith('http');
+        if (isOfflineOrContent) {
+          if (alertBox) {
+            alertBox.classList.remove('hidden');
+            alertBox.innerHTML = `
+              <i class="fa-solid fa-mobile-screen-button text-amber-500 text-sm mt-0.5 shrink-0"></i>
+              <div>
+                <span class="font-bold block">মোবাইল ফাইল মোড সক্রিয়</span>
+                <span class="text-amber-800">আপনি ফাইলটি সরাসরি ফোন থেকে ওপেন করেছেন। Google Login শুধুমাত্র লাইভ অনলাইন ওয়েবসাইট (https)-এ চলে। সহজে মন্তব্য করতে নিচে নাম লিখে "লগইন সম্পন্ন করুন" বাটনে চাপুন।</span>
+              </div>
+            `;
+          }
+        } else {
+          if (alertBox) alertBox.classList.add('hidden');
+        }
+        const nameInput = document.getElementById('directLoginName');
+        if (nameInput) setTimeout(() => nameInput.focus(), 150);
+      }
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('universalLoginModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleDirectLoginSubmit(e) {
+      if (e) e.preventDefault();
+      const nameInput = document.getElementById('directLoginName');
+      const emailInput = document.getElementById('directLoginEmail');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      if (!name) {
+        showToast(currentLang === 'bn' ? 'দয়া করে আপনার নাম লিখুন!' : 'Please enter your name!', 'error');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+
+      let email = emailInput ? emailInput.value.trim() : '';
+      if (!email) {
+        const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'user';
+        email = `${cleanName}_${Math.floor(1000 + Math.random() * 9000)}@guest.com`;
+      }
+
+      const cleanUser = {
+        name: String(name),
+        email: String(email),
+        avatar: String(selectedAvatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0284c7`),
+        authType: 'direct'
+      };
+
+      currentUser = cleanUser;
+      window.currentUser = cleanUser;
+
+      try {
+        localStorage.setItem('ht_current_user', safeStringify(cleanUser));
+      } catch(err) {
+        console.warn("Local storage save failed: " + (err?.message || String(err)));
+      }
+
+      updateLoggedInUI();
+      closeLoginModal();
+      showToast(currentLang === 'bn' ? 'সফলভাবে লগইন হয়েছে!' : 'Logged in successfully!', 'success');
+
+      if (window.pendingCommentText) {
+        const commentToPost = window.pendingCommentText;
+        window.pendingCommentText = "";
+        setTimeout(() => {
+          postComment(commentToPost);
+        }, 300);
+      }
+    }
+
+    async function triggerModalGoogleLogin() {
+      const isOfflineOrContent = window.location.protocol === 'content:' || 
+                                 window.location.protocol === 'file:' || 
+                                 !window.location.protocol.startsWith('http');
+      if (isOfflineOrContent) {
+        const alertBox = document.getElementById('loginDomainAlert');
+        if (alertBox) {
+          alertBox.classList.remove('hidden');
+          alertBox.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5 shrink-0"></i>
+            <div>
+              <span class="font-bold block">ফাইল থেকে Google Login সম্ভব নয়!</span>
+              <span class="text-amber-800">Google এর সিকিউরিটি নিয়ম অনুযায়ী অফলাইন বা ডাউনলোড করা ফাইলে Google Sign-In কাজ করে না। দয়া করে নিচে নাম লিখে "লগইন সম্পন্ন করুন" বাটনে চাপুন (১০০% কাজ করবে)।</span>
+            </div>
+          `;
+        }
+        showToast(currentLang === 'bn' ? 'Google Login শুধুমাত্র অনলাইন ওয়েবসাইটে চলে। নিচে নাম লিখে লগইন করুন!' : 'Google login requires live web hosting. Please enter name below!', 'info');
+        const nameInput = document.getElementById('directLoginName');
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.classList.add('ring-2', 'ring-blue-500');
+          setTimeout(() => nameInput.classList.remove('ring-2', 'ring-blue-500'), 2000);
+        }
+        return;
+      }
+
+      const googleBtn = document.getElementById('modalGoogleLoginBtn');
+      const googleText = document.getElementById('googleLoginText');
+
+      if (googleBtn) googleBtn.disabled = true;
+      if (googleText) googleText.innerText = "Connecting Google...";
+
+      try {
+        if (window.realGoogleLogin) {
+          const res = await window.realGoogleLogin();
+          if (res) {
+            closeLoginModal();
+          }
+        } else {
+          showToast('Firebase authentication initializing, please try direct login', 'info');
+        }
+      } catch(err) {
+        console.warn("Google login attempt finished:", err?.message || String(err));
+      } finally {
+        if (googleBtn) googleBtn.disabled = false;
+        if (googleText) googleText.innerText = "Google দিয়ে লগইন";
+      }
+    }
+
+    window.universalLogout = async () => {
+      if (window.realGoogleLogout) {
+        try { await window.realGoogleLogout(); } catch(e){}
+      }
+      currentUser = null;
+      window.currentUser = null;
+      try {
+        localStorage.removeItem('ht_current_user');
+      } catch(e){}
+      updateLoggedInUI();
+      showToast(currentLang === 'bn' ? 'লগআউট সম্পন্ন হয়েছে' : 'Logged out successfully', 'info');
+    };
+
+    function initCommentsSystem() {
+      // Local storage as fallback/loading state
+      const storedComments = localStorage.getItem('ht_custom_comments');
+      if (storedComments) {
+        try {
+          commentsData = JSON.parse(storedComments);
+          renderComments();
+        } catch(e){}
+      }
+      
+      const sessionUser = localStorage.getItem('ht_current_user');
+      if (sessionUser) {
+        try {
+          currentUser = JSON.parse(sessionUser);
+          window.currentUser = currentUser;
+          updateLoggedInUI();
+        } catch(e){}
+      }
+    }
+
+    // Step 1: User clicks post
+    function handleCommentSubmit() {
+      const textarea = document.getElementById('commentInput');
+      const text = textarea.value.trim();
+
+      if (!text) {
+        showToast(currentLang === 'bn' ? 'দয়া করে কিছু কমেন্ট লিখুন!' : 'Please write a comment!', 'error');
+        textarea.focus();
+        return;
+      }
+
+      const activeUser = window.currentUser || currentUser;
+      if (!activeUser) {
+        window.pendingCommentText = text;
+        showToast(currentLang === 'bn' ? 'কমেন্ট করতে প্রথমে লগইন করুন' : 'Please login to post your comment', 'info');
+        openLoginModal();
+      } else {
+        postComment(text);
+      }
+    }
+
+    // Expose these for Firebase module and UI
+    window.postComment = postComment;
+    window.updateLoggedInUI = updateLoggedInUI;
+    window.showToast = showToast;
+    window.openLoginModal = openLoginModal;
+    window.closeLoginModal = closeLoginModal;
+    window.selectAvatarPreset = selectAvatarPreset;
+    window.updateAvatarPreview = updateAvatarPreview;
+    window.handleDirectLoginSubmit = handleDirectLoginSubmit;
+    window.triggerModalGoogleLogin = triggerModalGoogleLogin;
+
+    window.setCommentsData = (data) => {
+        commentsData = Array.isArray(data) ? [...data] : [];
+        renderComments();
+    };
+
+    function updateLoggedInUI() {
+      const activeUser = window.currentUser || currentUser;
+      const loggedInUserInfo = document.getElementById('loggedInUserInfo');
+      const quickLoginBtn = document.getElementById('quickLoginBtn');
+
+      if(activeUser) {
+        if (loggedInUserInfo) loggedInUserInfo.classList.remove('hidden');
+        if (quickLoginBtn) quickLoginBtn.classList.add('hidden');
+        const avatarEl = document.getElementById('loggedInAvatar');
+        if (avatarEl) {
+          avatarEl.src = activeUser.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(activeUser.name)}&backgroundColor=0284c7`;
+        }
+        const nameEl = document.getElementById('loggedInName');
+        if (nameEl) nameEl.innerText = activeUser.name;
+        const emailEl = document.getElementById('loggedInEmail');
+        if (emailEl) emailEl.innerText = activeUser.email;
+      } else {
+        if (loggedInUserInfo) loggedInUserInfo.classList.add('hidden');
+        if (quickLoginBtn) quickLoginBtn.classList.remove('hidden');
+      }
+    }
+
+    // Global error handler to prevent circular structure errors in console proxy
+    window.onerror = function(message, source, lineno, colno, error) {
+      const errStr = error instanceof Error ? error.message : String(message);
+      console.error(`Global Error: ${errStr} at ${source}:${lineno}:${colno}`);
+      return false; // Let the error propagate but we've logged it safely as a string
+    };
+
+    window.onunhandledrejection = function(event) {
+      const errStr = event.reason instanceof Error ? event.reason.message : String(event.reason);
+      console.error(`Unhandled Rejection: ${errStr}`);
+    };
+
+    function safeStringify(obj) {
+        try {
+            return JSON.stringify(obj);
+        } catch (e) {
+            console.warn("JSON Stringify failed, attempting circular-safe version");
+            const seen = new WeakSet();
+            return JSON.stringify(obj, (key, value) => {
+                if (typeof value === "object" && value !== null) {
+                    if (seen.has(value)) return "[Circular]";
+                    seen.add(value);
+                }
+                return value;
+            });
+        }
+    }
+
+    // Post comment logic
+    function postComment(text) {
+      const activeUser = window.currentUser || currentUser;
+      if (!activeUser) return;
+
+      const newCommentId = Date.now().toString();
+      // Ensure we only use plain strings to avoid circular JSON errors
+      const commentObj = {
+        id: newCommentId,
+        name: String(activeUser.name || 'User'),
+        email: String(activeUser.email || ''),
+        avatar: String(activeUser.avatar || ''),
+        text: String(text),
+        likes: 0,
+        likedBy: [],
+        timestamp: Date.now()
+      };
+
+      // Call Firestore if available
+      if (window.db_saveComment) {
+        window.db_saveComment(commentObj);
+      } else {
+        // Fallback for offline/no firebase
+        commentsData.unshift(commentObj);
+        try {
+            localStorage.setItem('ht_custom_comments', safeStringify(commentsData));
+        } catch(e) { console.error("Local storage fail: " + (e instanceof Error ? e.message : String(e))); }
+        renderComments();
+      }
+
+      document.getElementById('commentInput').value = '';
+      showToast(currentLang === 'bn' ? 'আপনার কমেন্টটি সফলভাবে পোস্ট হয়েছে!' : 'Your comment was posted successfully!', 'success');
+
+      // --- Send Notification ---
+      if (typeof emailjs !== 'undefined') {
+        try {
+          const currentUrl = window.location.href.split('?')[0];
+          const commentLink = `${currentUrl}?comment=${newCommentId}`;
+          const adminEmail = "indhassan6050@gmail.com";
+
+          const sendMail = (toEmail, toName, subj) => {
+              emailjs.send("service_mhebexh", "template_z71f2s8", {
+                  name: String(activeUser.name || 'User'),
+                  email: String(toEmail),
+                  sender_email: String(activeUser.email || ''),
+                  comment: String(text),
+                  view_url: String(commentLink),
+                  to_name: String(toName),
+                  subject: String(subj)
+              }).catch(e => console.warn("Email send failed: " + (e?.message || String(e))));
+          };
+
+          sendMail(adminEmail, "Admin", "New Website Activity");
+
+          if (text.startsWith('@')) {
+              const mentionedName = text.split(' ')[0].substring(1).toLowerCase();
+              const target = commentsData.find(c => c.name && c.name.toLowerCase().includes(mentionedName) && c.email);
+              if (target && target.email && target.email !== activeUser.email && target.email !== adminEmail) {
+                  sendMail(target.email, target.name, "Someone replied to your comment");
+              }
+          }
+        } catch (e) {
+          console.warn("Notification system error: " + (e?.message || String(e)));
+        }
+      }
+    }
+
+    function updateTimes() {
+      const timeElements = document.querySelectorAll('.comment-time');
+      timeElements.forEach(el => {
+        const timestamp = parseInt(el.getAttribute('data-timestamp'));
+        el.innerText = timeAgo(timestamp);
+      });
+    }
+
+    function timeAgo(timestamp) {
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + (currentLang === 'bn' ? " বছর আগে" : " years ago");
+      
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + (currentLang === 'bn' ? " মাস আগে" : " months ago");
+      
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + (currentLang === 'bn' ? " দিন আগে" : " days ago");
+      
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + (currentLang === 'bn' ? " ঘন্টা আগে" : " hours ago");
+      
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + (currentLang === 'bn' ? " মিনিট আগে" : " minutes ago");
+      
+      return currentLang === 'bn' ? "এইমাত্র" : "Just now";
+    }
+
+    setInterval(updateTimes, 60000); // Update times every minute
+
+    function renderComments() {
+      const container = document.getElementById('commentsContainer');
+      const commentSuffix = currentLang === 'bn' ? 'কমেন্ট' : 'Comments';
+      document.getElementById('commentTotalText').innerText = `${commentsData.length} ${commentSuffix}`;
+
+      container.innerHTML = commentsData.map(c => {
+        const hasLiked = (c.likedBy && window.currentUser && c.likedBy.includes(window.currentUser.email));
+        return `
+        <div id="comment-${c.id}" class="comment-item py-3 space-y-1.5 transition-all hover:bg-slate-50/70 rounded-xl px-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <img src="${c.avatar}" class="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 object-cover">
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                  ${escapeHtml(c.name)}
+                </h4>
+                <p class="text-[9px] text-slate-400 comment-time" data-timestamp="${c.timestamp}">${timeAgo(c.timestamp)}</p>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-700 pl-9 font-normal leading-relaxed">${escapeHtml(c.text)}</p>
+          <div class="flex items-center gap-3 pl-9 pt-1 text-[10px] text-slate-400">
+            <button onclick="likeComment('${c.id}', this)" class="btn-press hover:text-blue-600 flex items-center gap-1 transition-colors ${hasLiked ? 'text-blue-600 font-bold' : ''}">
+              <i class="fa-regular fa-thumbs-up"></i> <span class="like-count">${c.likes || 0}</span>
+            </button>
+            <button onclick="replyAlert('${escapeHtml(c.name)}')" class="btn-press hover:text-blue-600 transition-colors">Reply</button>
+          </div>
+        </div>
+      `; }).join('');
+    }
+
+    async function likeComment(id, btn) {
+      const activeUser = window.currentUser || currentUser;
+      
+      if (!activeUser) {
+        showToast(currentLang === 'bn' ? 'লাইক করতে লগইন করুন' : 'Login to like', 'info');
+        openLoginModal();
+        return;
+      }
+
+      const item = commentsData.find(c => String(c.id) === String(id));
+      if (item) {
+        if (!item.likedBy) item.likedBy = [];
+        const userHasLiked = item.likedBy.includes(activeUser.email);
+        
+        let newLikes = item.likes || 0;
+        let newLikedBy = [...item.likedBy];
+
+        if (userHasLiked) {
+           newLikes = Math.max(0, newLikes - 1);
+           newLikedBy = newLikedBy.filter(email => email !== activeUser.email);
+        } else {
+           newLikes++;
+           newLikedBy.push(activeUser.email);
+        }
+
+        // Update Firestore if available
+        if (window.db_likeComment) {
+          window.db_likeComment(id, newLikes, newLikedBy);
+        } else {
+          // Fallback to local
+          item.likes = newLikes;
+          item.likedBy = newLikedBy;
+          try {
+            localStorage.setItem('ht_custom_comments', safeStringify(commentsData));
+          } catch(e) {}
+          renderComments();
+        }
+      }
+    }
+
+    function replyAlert(name) {
+      document.getElementById('commentInput').value = `@${name} `;
+      document.getElementById('commentInput').focus();
+    }
+
+    function sortComments(order) {
+      const btnNewest = document.getElementById('btnNewest');
+      const btnOldest = document.getElementById('btnOldest');
+
+      if (order === 'oldest') {
+        commentsData.sort((a, b) => a.timestamp - b.timestamp);
+        btnOldest.className = "btn-press px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-2xs font-bold";
+        btnNewest.className = "btn-press px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition-colors";
+      } else {
+        commentsData.sort((a, b) => b.timestamp - a.timestamp);
+        btnNewest.className = "btn-press px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-2xs font-bold";
+        btnOldest.className = "btn-press px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition-colors";
+      }
+
+      renderComments();
+    }
+
+    function escapeHtml(text) {
+      return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
+    }
+
+    // --- Language Switcher ---
+    let currentLang = 'en';
+    const translationNodes = [];
+
+    const translationMap = [
+      { en: "Not just a profile, it's my story", bn: "শুধু একটি প্রোফাইল নয়, এটি আমার গল্প" },
+      { en: "Home", bn: "হোম" },
+      { en: "About & Termux", bn: "সম্পর্কে ও টারমাক্স" },
+      { en: "Skills & Services", bn: "দক্ষতা ও সেবাসমূহ" },
+      { en: "Contact & Socials", bn: "যোগাযোগ ও সোশ্যাল" },
+      { en: "Experience & Gallery", bn: "অভিজ্ঞতা ও গ্যালারি" },
+      { en: "YouTube / Video", bn: "ইউটিউব / ভিডিও" },
+      { en: "Comments & Reviews", bn: "কমেন্ট ও রিভিউ" },
+      { en: "Dream", bn: "স্বপ্ন" },
+      { en: "Learn", bn: "শেখা" },
+      { en: "Build", bn: "গড়া" },
+      { en: "Developer | Cyber Security & Termux Specialist", bn: "ডেভেলপার | সাইবার সিকিউরিটি ও টারমাক্স স্পেশালিস্ট" },
+      { en: "\"Simple life, beautiful dreams.\"", bn: "\"সাধারণ জীবন, সুন্দর স্বপ্ন।\"" },
+      { en: "Bangladesh", bn: "বাংলাদেশ" },
+      { en: "Active Now", bn: "সক্রিয় আছেন" },
+      { en: "Verified", bn: "ভেরিফাইড" },
+      { en: "Social Links", bn: "সোশ্যাল লিংক" },
+      { en: "Termux", bn: "টারমাক্স" },
+      { en: "CLI Expert", bn: "সিএলআই এক্সপার্ট" },
+      { en: "Focused", bn: "ফোকাসড" },
+      { en: "About Me", bn: "আমার সম্পর্কে" },
+      { en: "Hi, I'm HT Farhan. I am a front-end web developer and cyber security enthusiast. I specialize in Linux CLI environments like Termux, bash script automation, network security testing, and building modern web applications.", bn: "হাই, আমি এইচটি ফারহান। আমি একজন ফ্রন্ট-এন্ড ওয়েব ডেভেলপার এবং সাইবার সিকিউরিটি স্পেশালিস্ট। টারমাক্স, ব্যাশ স্ক্রিপ্টিং এবং মডার্ন ওয়েব অ্যাপ্লিকেশনে আমি পারদর্শী।" },
+      { en: "Termux & Cyber Security", bn: "টারমাক্স ও সাইবার সিকিউরিটি" },
+      { en: "CLI & Audit", bn: "সিএলআই ও অডিট" },
+      { en: "I work with Android Linux terminal (Termux), bash scripting, security testing, and custom automation scripts for educational and defense purposes.", bn: "আমি অ্যান্ড্রয়েড লিনাক্স টার্মিনাল (টারমাক্স), ব্যাশ স্ক্রিপ্টিং, সিকিউরিটি টেস্টিং এবং অটোমেশন স্ক্রিপ্ট নিয়ে কাজ করি।" },
+      { en: "Skills & Technical Stack", bn: "দক্ষতা ও টেকনিক্যাল স্ট্যাক" },
+      { en: "HTML, CSS & JavaScript", bn: "এইচটিএমএল, সিএসএস ও জাভাস্ক্রিপ্ট" },
+      { en: "Termux & Bash Scripting", bn: "টারমাক্স ও ব্যাশ স্ক্রিপ্টিং" },
+      { en: "Cyber Security & Network Audit", bn: "সাইবার সিকিউরিটি ও নেটওয়ার্ক অডিট" },
+      { en: "Tailwind CSS & UI Design", bn: "টেইলউইন্ড সিএসএস ও ইউআই ডিজাইন" },
+      { en: "Services & Solutions", bn: "সেবাসমূহ ও সমাধান" },
+      { en: "Web App Dev", bn: "ওয়েব অ্যাপ ডেভেলপমেন্ট" },
+      { en: "Responsive Front-End UI", bn: "রেস্পন্সিভ ফ্রন্ট-এন্ড ইউআই" },
+      { en: "Termux Scripts", bn: "টারমাক্স স্ক্রিপ্ট" },
+      { en: "Automated Tools Setup", bn: "অটোমেটেড টুলস সেটআপ" },
+      { en: "Security Audit", bn: "সিকিউরিটি অডিট" },
+      { en: "Vulnerability Testing", bn: "ভালনারেবিলিটি টেস্টিং" },
+      { en: "Custom UI/UX", bn: "কাস্টম ইউআই/ইউএক্স" },
+      { en: "Tailwind & Animations", bn: "টেইলউইন্ড ও অ্যানিমেশন" },
+      { en: "Contact Info", bn: "যোগাযোগের তথ্য" },
+      { en: "Email", bn: "ইমেইল" },
+      { en: "Phone / WhatsApp", bn: "ফোন / হোয়াটসঅ্যাপ" },
+      { en: "Location", bn: "অবস্থান" },
+      { en: "Date of Birth", bn: "জন্ম তারিখ" },
+      { en: "Social Networks", bn: "সোশ্যাল নেটওয়ার্ক" },
+      { en: "10 Connected", bn: "১০টি সংযুক্ত" },
+      { en: "Personal Info", bn: "ব্যক্তিগত তথ্য" },
+      { en: "Full Name", bn: "পুরো নাম" },
+      { en: "Gender", bn: "লিঙ্গ" },
+      { en: "Male", bn: "পুরুষ" },
+      { en: "Nationality", bn: "জাতীয়তা" },
+      { en: "Bangladeshi", bn: "বাংলাদেশি" },
+      { en: "Religion", bn: "ধর্ম" },
+      { en: "Islam", bn: "ইসলাম" },
+      { en: "Blood Group", bn: "রক্তের গ্রুপ" },
+      { en: "Background", bn: "ব্যাকগ্রাউন্ড" },
+      { en: "Education", bn: "শিক্ষা" },
+      { en: "B.Sc. Studies (In Progress)", bn: "বি.এসসি (অধ্যয়নরত)" },
+      { en: "Profession", bn: "পেশা" },
+      { en: "Student & Developer", bn: "ছাত্র ও ডেভেলপার" },
+      { en: "Marital Status", bn: "বৈবাহিক অবস্থা" },
+      { en: "Single", bn: "অবিবাহিত" },
+      { en: "Hobbies & Games", bn: "শখ ও গেম" },
+      { en: "Coding, Scripting, Carrom, Ludo", bn: "কোডিং, স্ক্রিপ্টিং, ক্যারম, লুডু" },
+      { en: "Language", bn: "ভাষা" },
+      { en: "Bangla, English", bn: "বাংলা, ইংরেজি" },
+      { en: "Gallery", bn: "গ্যালারি" },
+      { en: "Education & Experience", bn: "শিক্ষা ও অভিজ্ঞতা" },
+      { en: "2023 – Present", bn: "২০২৩ – বর্তমান" },
+      { en: "Termux & Linux Security", bn: "টারমাক্স ও লিনাক্স সিকিউরিটি" },
+      { en: "Terminal Shell Automation", bn: "টার্মিনাল শেল অটোমেশন" },
+      { en: "Security", bn: "সিকিউরিটি" },
+      { en: "2024 – Present", bn: "২০২৪ – বর্তমান" },
+      { en: "Web Development", bn: "ওয়েব ডেভেলপমেন্ট" },
+      { en: "HTML, CSS, JS & Web Apps", bn: "এইচটিএমএল, সিএসএস, জেএস ও ওয়েব অ্যাপস" },
+      { en: "Dev", bn: "ডেভ" },
+      { en: "Telegram Video Player", bn: "টেলিগ্রাম ভিডিও প্লেয়ার" },
+      { en: "Official Channel Stream", bn: "অফিসিয়াল চ্যানেল স্ট্রিম" },
+      { en: "HD Media", bn: "এইচডি মিডিয়া" },
+      { en: "Termux CLI & Cyber Security Overview", bn: "টারমাক্স সিএলআই ও সাইবার সিকিউরিটি ওভারভিউ" },
+      { en: "Learn Linux commands, bash scripting, and modern tool setup.", bn: "লিনাক্স কমান্ড, ব্যাশ স্ক্রিপ্টিং এবং মডার্ন টুলস সেটআপ শিখুন।" },
+      { en: "HT Farhan Post", bn: "এইচটি ফারহান পোস্ট" },
+      { en: "Watch in Telegram", bn: "টেলিগ্রামে দেখুন" },
+      { en: "আপনার নাম এবং মতামত সরাসরি কমেন্ট পোস্ট করুন।", bn: "আপনার নাম এবং মতামত সরাসরি কমেন্ট পোস্ট করুন।" },
+      { en: "Post your name and opinion directly in the comments.", bn: "আপনার নাম এবং মতামত সরাসরি কমেন্ট পোস্ট করুন।" },
+      { en: "0 Comments", bn: "০ কমেন্ট" },
+      { en: "Newest", bn: "নতুন" },
+      { en: "Oldest", bn: "পুরাতন" },
+      { en: "Fast & Live Posting", bn: "ফাস্ট ও লাইভ পোস্টিং" },
+      { en: "Post", bn: "পোস্ট" },
+      { en: "Logout", bn: "লগআউট" }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      while (node = walker.nextNode()) {
+        const text = node.nodeValue.trim();
+        if (text) {
+          const match = translationMap.find(item => item.en === text || item.bn === text);
+          if (match) {
+            translationNodes.push({
+              node: node,
+              en: match.en,
+              bn: match.bn,
+              isPlaceholder: false
+            });
+          }
+        }
+      }
+
+      const inputs = document.querySelectorAll('[placeholder]');
+      inputs.forEach(input => {
+        const ph = input.placeholder.trim();
+        if (ph) {
+          const match = translationMap.find(item => item.en === ph || item.bn === ph);
+          if (match) {
+            translationNodes.push({
+              node: input,
+              en: match.en,
+              bn: match.bn,
+              isPlaceholder: true
+            });
+          } else if (ph === "Write an awesome comment here...") {
+            translationNodes.push({
+              node: input,
+              en: ph,
+              bn: "একটি চমৎকার কমেন্ট লিখুন...",
+              isPlaceholder: true
+            });
+          }
+        }
+      });
+    });
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'bn' : 'en';
+      const isBn = currentLang === 'bn';
+
+      if (isBn) {
+        document.getElementById('langBnBtn').classList.add('bg-white', 'shadow-sm', 'text-blue-600');
+        document.getElementById('langBnBtn').classList.remove('text-slate-500');
+        document.getElementById('langEnBtn').classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
+        document.getElementById('langEnBtn').classList.add('text-slate-500');
+      } else {
+        document.getElementById('langEnBtn').classList.add('bg-white', 'shadow-sm', 'text-blue-600');
+        document.getElementById('langEnBtn').classList.remove('text-slate-500');
+        document.getElementById('langBnBtn').classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
+        document.getElementById('langBnBtn').classList.add('text-slate-500');
+      }
+
+      translationNodes.forEach(item => {
+        const newText = isBn ? item.bn : item.en;
+        if (item.isPlaceholder) {
+          item.node.placeholder = newText;
+        } else {
+          item.node.nodeValue = newText;
+        }
+      });
+
+      renderComments(); // Re-render comments to apply translation to suffix
+    }
+
+    // Auto-scroll and highlight comment from URL
+    function handleUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const commentId = urlParams.get('comment');
+      
+      if (commentId) {
+        setTimeout(() => {
+          const element = document.getElementById(`comment-${commentId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('bg-yellow-100', 'ring-2', 'ring-blue-400');
+            
+            // Remove highlight after 3 seconds
+            setTimeout(() => {
+              element.classList.remove('bg-yellow-100', 'ring-2', 'ring-blue-400');
+            }, 3000);
+          }
+        }, 1000); // Wait for comments to render
+      }
+    }
+
+    // Call this after initial rendering
+    window.addEventListener('load', handleUrlParams);
+  </script>
+
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+    import { initializeFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+    // Disable Firestore internal logging to prevent circular structure errors in the platform proxy
+    setLogLevel('silent');
+
+    // Auto-switch Firebase configuration based on domain
+    const userConfig = {
+      apiKey: "AIzaSyDntCd-ltETi4Wk5rK5Yp8hAa7LSLHJUBk",
+      authDomain: "ht-farhan-a0395.firebaseapp.com",
+      projectId: "ht-farhan-a0395",
+      storageBucket: "ht-farhan-a0395.firebasestorage.app",
+      messagingSenderId: "1075845322479",
+      appId: "1:1075845322479:web:2bdb5d094b1cd535f3ed1a",
+      measurementId: "G-M0HJ0KK77X"
+    };
+
+    const aiStudioConfig = {
+      projectId: "ringed-lantern-5nn32",
+      appId: "1:187785028619:web:c7fdc867eda55ab7d2530e",
+      apiKey: "AIzaSyDizaMoun6HMqHkLlAEIyQs9ux4dHvUb7Y",
+      authDomain: "ringed-lantern-5nn32.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-f4e1111d-d4ee-4dea-8b6a-99ddb908ddf7",
+      storageBucket: "ringed-lantern-5nn32.firebasestorage.app",
+      messagingSenderId: "187785028619"
+    };
+
+    const isAiStudio = window.location.hostname.includes("run.app") || window.location.hostname.includes("aistudio");
+    const firebaseConfig = isAiStudio ? aiStudioConfig : userConfig;
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      
+      // Use initializeFirestore with experimentalForceLongPolling to overcome network timeout issues
+      const db = initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        databaseId: firebaseConfig.firestoreDatabaseId || "(default)"
+      });
+      
+      const provider = new GoogleAuthProvider();
+
+      function handleFirestoreError(error, operationType, path) {
+        const errStr = error instanceof Error ? error.message : String(error);
+        console.warn(`Firestore Info [${operationType}] at ${path}: ${errStr}`);
+        
+        if (errStr.includes('insufficient permissions')) {
+          showToast("Permission denied. Please log in again.", "error");
+        } else if (errStr.includes('Backend didn\'t respond') || errStr.includes('offline')) {
+           // Silent warning for network issues
+           console.log("Firestore is operating in offline mode or slow network.");
+        } else if (!errStr.includes('not-found')) {
+          showToast("Sync issue. Retrying...", "info");
+        }
+      }
+
+      // Firestore Comments Collection Reference
+      const commentsCol = collection(db, "comments");
+
+      // Save Comment to Firestore
+      window.db_saveComment = async (commentObj) => {
+        try {
+          await addDoc(commentsCol, {
+            ...commentObj,
+            timestamp: serverTimestamp() 
+          });
+        } catch (error) {
+          handleFirestoreError(error, 'WRITE', 'comments');
+          // If Firestore write fails, ensure comment is saved locally so user doesn't lose it!
+          if (!commentsData.some(c => c.id === commentObj.id)) {
+            commentsData.unshift(commentObj);
+            try {
+              localStorage.setItem('ht_custom_comments', safeStringify(commentsData));
+            } catch(e){}
+            renderComments();
+          }
+        }
+      };
+
+      // Like Comment in Firestore
+      window.db_likeComment = async (id, newLikes, newLikedBy) => {
+        try {
+          const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js");
+          const commentRef = doc(db, "comments", id);
+          await updateDoc(commentRef, {
+            likes: newLikes,
+            likedBy: newLikedBy
+          });
+        } catch (error) {
+          handleFirestoreError(error, 'UPDATE', `comments/${id}`);
+          // If Firestore update fails, keep local change
+          const item = commentsData.find(c => String(c.id) === String(id));
+          if (item) {
+            item.likes = newLikes;
+            item.likedBy = newLikedBy;
+            try {
+              localStorage.setItem('ht_custom_comments', safeStringify(commentsData));
+            } catch(e){}
+            renderComments();
+          }
+        }
+      };
+
+      // Real-time listener for comments
+      const q = query(commentsCol, orderBy("timestamp", "desc"));
+      onSnapshot(q, (snapshot) => {
+        const comments = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          comments.push({
+            id: String(doc.id),
+            name: String(data.name || 'User'),
+            email: String(data.email || ''),
+            avatar: String(data.avatar || ''),
+            text: String(data.text || ''),
+            likes: Number(data.likes || 0),
+            likedBy: Array.isArray(data.likedBy) ? data.likedBy.map(e => String(e)) : [],
+            timestamp: data.timestamp ? data.timestamp.toMillis() : Date.now()
+          });
+        });
+        window.setCommentsData(comments);
+      }, (error) => {
+        handleFirestoreError(error, 'GET', 'comments');
+      });
+
+      // Removed redundant testConnection to reduce console noise
+
+      // Google Login
+      const postBtn = document.querySelector('button[onclick="handleCommentSubmit()"]');
+      let isAuthPending = false;
+
+      function updateAuthUI(pending) {
+        if (!postBtn) return;
+        if (pending) {
+          postBtn.disabled = true;
+          postBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+          postBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        } else {
+          postBtn.disabled = false;
+          postBtn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i> Post';
+          postBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+      }
+
+      window.realGoogleLogin = async () => {
+        if (isAuthPending) return null;
+
+        const isOfflineOrContent = window.location.protocol === 'content:' || 
+                                   window.location.protocol === 'file:' || 
+                                   !window.location.protocol.startsWith('http');
+        if (isOfflineOrContent) {
+          showToast(currentLang === 'bn' ? 'অফলাইন/মোবাইল ফাইলে Google লগইন চলে না। নিচে নাম লিখে সরাসরি লগইন করুন।' : 'Google login requires live web hosting. Please use direct login below.', 'info');
+          const domainAlert = document.getElementById('loginDomainAlert');
+          if (domainAlert) domainAlert.classList.remove('hidden');
+          const nameInput = document.getElementById('directLoginName');
+          if (nameInput) setTimeout(() => nameInput.focus(), 150);
+          return null;
+        }
+        
+        isAuthPending = true;
+        updateAuthUI(true);
+
+        try {
+          // Strict 8-second timeout so Google popup NEVER hangs indefinitely on mobile
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+              const err = new Error('Auth timeout - popup did not respond');
+              err.code = 'auth/timeout';
+              reject(err);
+            }, 8000);
+          });
+
+          const res = await Promise.race([
+            signInWithPopup(auth, provider),
+            timeoutPromise
+          ]);
+
+          showToast(currentLang === 'bn' ? 'সফলভাবে লগইন হয়েছে!' : 'Successfully logged in!', 'success');
+          if (window.closeLoginModal) window.closeLoginModal();
+          if (window.pendingCommentText) {
+            setTimeout(() => {
+              window.postComment(window.pendingCommentText);
+              window.pendingCommentText = "";
+            }, 500);
+          }
+          return res;
+        } catch (error) {
+          const errorCode = error?.code || '';
+          const errMsg = error instanceof Error ? error.message : String(error);
+
+          // Handle user cancelling / closing popup without alarming error logs
+          if (errorCode === 'auth/popup-closed-by-user' || errorCode === 'auth/cancelled-popup-request') {
+            console.log("Firebase Auth: Login popup closed by user.");
+            showToast(currentLang === 'bn' ? 'লগইন উইন্ডো বন্ধ করা হয়েছে' : 'Login window was closed', 'info');
+            return null;
+          }
+
+          if (errorCode === 'auth/timeout') {
+            console.warn("Firebase Auth: Login timed out.");
+            const domainAlert = document.getElementById('loginDomainAlert');
+            if (domainAlert) {
+              domainAlert.classList.remove('hidden');
+              domainAlert.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5 shrink-0"></i>
+                <div>
+                  <span class="font-bold block">গুগল পপআপ খুলতে পারেনি!</span>
+                  <span class="text-amber-800">ব্রাউজার পপআপ ব্লক করেছে বা সময় বেশি লেগেছে। কোনো সমস্যা নেই, নিচে আপনার নাম লিখে "লগইন সম্পন্ন করুন" বাটনে চাপুন।</span>
+                </div>
+              `;
+            }
+            if (window.openLoginModal) window.openLoginModal();
+            const nameInput = document.getElementById('directLoginName');
+            if (nameInput) setTimeout(() => nameInput.focus(), 150);
+            showToast(currentLang === 'bn' ? 'গুগল পপআপ রেসপন্স করেনি। নিচে নাম লিখে সরাসরি লগইন করুন।' : 'Google popup did not respond. Please enter your name below.', 'info');
+            return null;
+          }
+
+          if (errorCode === 'auth/unauthorized-domain') {
+            console.warn("Firebase Auth: Unauthorized domain:", window.location.hostname);
+            const domainAlert = document.getElementById('loginDomainAlert');
+            if (domainAlert) {
+              domainAlert.classList.remove('hidden');
+              domainAlert.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm mt-0.5 shrink-0"></i>
+                <div>
+                  <span class="font-bold block">এই ডোমেইনে Google Login ব্লকড/অননুমোদিত!</span>
+                  <span class="text-amber-800">আপনার ওয়েবসাইট ডোমেইন (${window.location.hostname}) Firebase Authorized Domains-এ নেই। নিচে নাম লিখে সরাসরি লগইন করুন (১০০% কাজ করবে)।</span>
+                </div>
+              `;
+            }
+            if (window.openLoginModal) window.openLoginModal();
+            const nameInput = document.getElementById('directLoginName');
+            if (nameInput) setTimeout(() => nameInput.focus(), 150);
+            showToast(currentLang === 'bn' ? 'এই ডোমেইনে Google Login রেস্ট্রিক্টেড। নিচে নাম লিখে সরাসরি লগইন করুন!' : 'Domain not authorized. Please enter your name below to login directly.', 'info');
+            return null;
+          }
+
+          if (errorCode === 'auth/popup-blocked') {
+            console.warn("Firebase Auth: Popup blocked by browser.");
+            showToast(currentLang === 'bn' ? 'পপআপ ব্লকড হয়েছে। নিচে নাম লিখে সরাসরি লগইন করুন।' : 'Popup was blocked. Please use direct profile login below.', 'info');
+            if (window.openLoginModal) window.openLoginModal();
+            return null;
+          }
+
+          if (errorCode === 'auth/operation-not-allowed') {
+            console.warn("Firebase Auth: Google sign-in provider is not enabled in Firebase Console.");
+            showToast(currentLang === 'bn' ? 'গুগল সাইন-ইন সক্রিয় নেই। সরাসরি লগইন করুন।' : 'Google login not enabled. Please use direct login.', 'info');
+            return null;
+          }
+
+          console.warn("Firebase Login Notice:", errMsg);
+          showToast(error.message || 'Login failed, please use direct login', 'error');
+          return null;
+        } finally {
+          isAuthPending = false;
+          updateAuthUI(false);
+        }
+      };
+
+      window.realGoogleLogout = async () => {
+        try {
+          await signOut(auth);
+          window.currentUser = null;
+          currentUser = null;
+          localStorage.removeItem('ht_current_user');
+          window.updateLoggedInUI();
+          showToast('Logged out successfully', 'info');
+        } catch(error) {
+          showToast('Logout failed', 'error');
+        }
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const cleanUser = {
+            name: String(user.displayName || 'User'),
+            email: String(user.email || ''),
+            avatar: String(user.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.displayName || 'User')}&backgroundColor=0284c7`),
+            authType: 'google'
+          };
+          window.currentUser = cleanUser;
+          currentUser = cleanUser;
+          try {
+            localStorage.setItem('ht_current_user', safeStringify(cleanUser));
+          } catch(e) { console.warn("Local storage save failed"); }
+          window.updateLoggedInUI();
+        } else {
+          // If no Firebase Google session, check if a direct user exists
+          const stored = localStorage.getItem('ht_current_user');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              if (parsed && parsed.authType === 'google') {
+                window.currentUser = null;
+                currentUser = null;
+                localStorage.removeItem('ht_current_user');
+                window.updateLoggedInUI();
+              } else if (parsed && parsed.name) {
+                window.currentUser = parsed;
+                currentUser = parsed;
+                window.updateLoggedInUI();
+              }
+            } catch(e) {}
+          } else {
+            window.currentUser = null;
+            currentUser = null;
+            window.updateLoggedInUI();
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Firebase initialization error:", e instanceof Error ? e.message : String(e));
+    }
+  </script>
+</body>
+</html>
